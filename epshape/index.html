@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name='title' property='og:title' content='EP Shape Previewer'/>
+    <meta name='author' content='Chul-Hong Park'>
+    <meta name='description' property='og:description' content='Shape previewer for EnergyPlus models'/>
+    <meta property='og:url' content='https://chp-rubicell.github.io/epshape/'/>
+    <meta name='image' property='og:image' content='https://chp-rubicell.github.io/epshape/resources/thumbnail.jpg'/>
+    <meta name='twitter:image' content='https://chp-rubicell.github.io/epshape/resources/thumbnail.jpg' />
+    <meta property='og:image:width' content='1200' />
+    <meta property='og:image:height' content='627' />
+    <meta property='og:type' content='website' />
+    <link rel="icon" href="https://chp-rubicell.github.io/epshape/resources/favicon.png">
+    <title>EP Shape Previewer</title>
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=23_0610" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Inconsolata&display=swap" rel="stylesheet">
+    <script src="resources/three.js"></script>
+    <script src="resources/CSS2DRenderer.js"></script>
+    <script src="resources/earcut.js"></script>
+    <script src="resources/iddLibrary.js?v=23_0706"></script>
+</head>
+
+<body>
+
+    <div class="bg" style="background-image: url('resources/bg.jpg');"></div>
+
+    <div id="fileHoverMask" class="bg" style="z-index: 21; display: none;"></div>
+
+
+    <div id="PageWrapper">
+
+        <div id="MainPanel"">
+
+            <h2>
+                <img height="40px" src="resources/eplogo.png" style="vertical-align: middle;"/>
+                EnergyPlus Shape Previewer
+            </h2>
+            <div style="width: 100%; height: auto; text-align: right; display: block; margin-top: 10px; margin-bottom: 15px;">
+                <div id="fileSelectorTag"></div>
+                &nbsp;
+                <label id="fileSelectorBtn" class="customButton" for="fileSelector">IDF File</label>
+                <input id="fileSelector" type="file" accept=".txt, .idf" style="display:none;">
+            </div>
+
+            <div id="CanvasContainer" oncontextmenu="return false;" style="position: relative; background-color: white;" draggable="false">
+
+                <div id="fileHover" class="bg" style="background: radial-gradient(#000000a0, #00000000); z-index: 20; display: none;"><p id="fileHoverText">drop to load file</p></div>
+                
+
+                <div id="HoverBtnWrapper">
+                    <button id="SaveBtn" class="hoverBtn settingsPanel" onclick="exportImage();"></button>
+                    <button id="SettingsBtn" class="hoverBtn settingsPanel" onclick="settingsPanelVisibility(1);"></button>
+                </div>
+
+                <div id="SettingsPanel" class="settingsPanel">
+                    <div id="SettingsCloseBtn" onclick="settingsPanelVisibility(0);"></div>
+
+                    <div id="SettingsPanelContent">
+                        <!-- <input type="checkbox" name="xxx" value="yyy" checked> Test -->
+                        <!-- <div class="settingsPanelBlock">
+                            <h5>Zone Visibility</h5>
+
+                            <center>
+                                <button class="settingsPanelButton">Select all</button>
+                                <button class="settingsPanelButton">Deselect all</button>
+                            </center>
+
+                            <label><input type="checkbox" checked>TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest</label>
+                            <label><input type="checkbox" checked>TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest</label>
+                            <label><input type="checkbox" checked>TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest</label>
+                        </div> -->
+                    </div>
+                </div>
+
+                <div id="CommandListener" class="settingsPanel"></div>
+
+            </div>
+
+            <div class="panel" style="padding-top: 15px;">
+                <div class="separator"></div>
+                <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
+                <p><small>
+                    <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
+                    UPDATED ON<b>&nbsp;&nbsp;2023-07-17</b>
+                </small></p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const pad = 40;
+        const minWidth = 550;
+        const maxWidth = 900;
+        const panelWidth = 800;
+        const panelHeight = 500;
+        var canvMult = 2;
+        if (window.location.hash) {
+            hashStr = window.location.hash.replace('#', '').toLowerCase();
+            hashVal = parseFloat(hashStr);
+            if (!isNaN(hashVal)) {
+                canvMult = hashVal;
+            }
+            if (hashStr.endsWith('c')) {}
+        }
+        console.log('Canvas multiplier: ' + canvMult);
+        const canvWidth = parseInt(panelWidth * canvMult);
+        const canvHeight = parseInt(panelHeight * canvMult);
+
+        const MainPanel = document.getElementById('MainPanel');
+        const CanvasContainer = document.getElementById("CanvasContainer");
+        const CanvasRenderer = document.getElementById("CanvasRenderer");
+
+        CanvasContainer.style.width = panelWidth+"px";
+        CanvasContainer.style.height = panelHeight+"px";
+
+        window.onresize = screenManager;
+
+        function screenManager() {
+            var screenWidth = document.body.clientWidth - pad * 2;
+            var mainPanelLeft = 0;
+            var mainPanelWidth = 0;
+
+            if(screenWidth < minWidth) {
+                mainPanelLeft = pad;
+                mainPanelWidth = minWidth;
+            }
+            else if(screenWidth < maxWidth) {
+                mainPanelLeft = pad;
+                mainPanelWidth = screenWidth;
+            }
+            else {
+                mainPanelLeft = pad + (screenWidth - maxWidth) / 2;
+                mainPanelWidth = maxWidth;
+            }
+            MainPanel.style.marginLeft = mainPanelLeft + 'px';
+            MainPanel.style.marginRight = mainPanelLeft + 'px';
+            MainPanel.style.width = mainPanelWidth + 'px';
+            CanvasContainer.style.width = mainPanelWidth + 'px';
+            CanvasContainer.style.height = mainPanelWidth * canvHeight / canvWidth + 'px';
+            // CanvasRenderer.style.width = mainPanelWidth + 'px';
+            // CanvasRenderer.style.height = mainPanelWidth * canvHeight / canvWidth + 'px';
+        }
+        screenManager();
+    </script>
+    <script src="resources/scripts.js?v=23_0706"></script>
+    <script>
+        const hoverBtn = document.getElementById('HoverBtnWrapper');
+        hoverBtnMargin = Number(getComputedStyle(hoverBtn).margin.slice(0, -2));
+
+        const settingsPanel = document.getElementById('SettingsPanel');
+
+        settingsPanelVisibility(-1);
+        hoverBtn.classList.remove('fadeoutSlide');
+        
+        function settingsPanelVisibility(toggle=null) {
+            hoverBtn.blur();
+
+            if (toggle==undefined || toggle==null) {
+                if (clickable) toggle = 1;
+                else toggle = 0;
+            }
+
+            switch (toggle) {
+                case -1:
+                    // 모두 닫으려고 할 때
+                    clickable = false;
+                    
+                    hoverBtn.style.top = - hoverBtn.clientHeight - hoverBtnMargin*2 + 'px';
+                    hoverBtn.classList.remove('fadeinSlide');
+                    hoverBtn.classList.add('fadeoutSlide');
+
+                    settingsPanel.style.visibility = 'hidden';
+                    settingsPanel.style.opacity = 0;
+                    settingsPanel.classList.remove('fadein');
+                    settingsPanel.classList.add('fadeout');
+                    
+                    break;
+
+                case 0:
+                    // 창이 열려있을 때
+                    clickable = true;
+
+                    hoverBtn.style.top = '0px';
+                    hoverBtn.classList.remove('fadeoutSlide');
+                    hoverBtn.classList.add('fadeinSlide');
+
+                    settingsPanel.style.visibility = 'hidden';
+                    settingsPanel.style.opacity = 0;
+                    settingsPanel.classList.remove('fadein');
+                    settingsPanel.classList.add('fadeout');
+                    
+                    break;
+
+                case 1:
+                    // 창이 닫혀있을 때
+                    clickable = false;
+                    
+                    hoverBtn.style.top = -hoverBtn.clientHeight - hoverBtnMargin*2 + 'px';
+                    hoverBtn.classList.remove('fadeinSlide');
+                    hoverBtn.classList.add('fadeoutSlide');
+
+                    settingsPanel.style.visibility = 'visible';
+                    settingsPanel.style.opacity = 1;
+                    settingsPanel.classList.remove('fadeout');
+                    settingsPanel.classList.add('fadein');
+                    
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+    </script>
+
+</body>
+
+</html>

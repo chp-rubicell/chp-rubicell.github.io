@@ -1,0 +1,251 @@
+:root[colorTheme='light'] {
+    --bgImage: #fff;
+    --textColor: #33444f;
+    --btnColor: #33444f;
+    --btnBorder: rgba(51,68,79,0.3);
+    --btnHoverColor: #33444f;
+    --btnHoverBG: rgba(51,68,79,0.3);
+    --btnHoverShadow: rgba(255,255,255,0.3);
+    --btnActiveBG: rgba(158,227,255,0.8);
+    --btnActiveShadow: rgba(158,227,255,0.3);
+    --btn2Color: #26272C;
+    --btn2BG: rgba(158,227,255,0.3);
+    --btn2Shadow: rgba(147,182,196,0.3);
+    --btn2HoverBG: rgba(240,245,247,0.8);
+    --btn2HoverShadow: rgba(147,182,196,0.6);
+    --btn2ActiveBG: rgba(158,227,255,0.8);
+    --btn2ActiveShadow: rgba(158,227,255,0.3);
+}
+:root[colorTheme='dark'] {
+    --bgImage: #292A2F url('./img/bg.jpg');
+    --textColor: #fff;
+    --linkColor: #8D9194;
+    --linkHoverColor: #9ee3ff;
+    --btnColor: #fff;
+    --btnBorder: rgba(255,255,255,0.3);
+    --btnHoverColor: #33444f;
+    --btnHoverBG: rgba(255,255,255,0.8);
+    --btnHoverShadow: rgba(255,255,255,0.3);
+    --btnActiveBG: rgba(158,227,255,0.8);
+    --btnActiveShadow: rgba(158,227,255,0.3);
+    --btn2Color: #26272C;
+    --btn2BG: rgba(240,245,247,0.5);
+    --btn2Shadow: rgba(0,0,0,0.3);
+    --btn2HoverColor: #506b7d;
+    --btn2HoverBG: rgba(240,245,247,0.8);
+    --btn2HoverShadow: rgba(240,245,247,0.3);
+    --btn2ActiveColor: #fff;
+    --btn2ActiveBG: rgba(158,227,255,0.8);
+    --btn2ActiveShadow: rgba(158,227,255,0.3);
+}
+.lg-view {
+    display: block;
+}
+.sm-view {
+    display: none;
+}
+@media screen and (max-width: 400px) {
+    .lg-view {
+        display: none;
+    }
+    .sm-view {
+        display: block;
+    }
+}
+
+
+html, body {
+    position: absolute;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    /* overflow: hidden; */
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    color: var(--textColor);
+    cursor: default;
+    user-select: none;
+}
+html {
+    background: var(--bgImage);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    overflow-y: auto;
+}
+body {
+    padding: 30px min(30px, 5%);
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    display: flex;
+    align-items: center; /* vertical */
+    justify-content: center; /* horizontal */
+    overflow-y: auto;
+}
+hr {
+    border: solid;
+    border-width: 0 0 1.5px 0;
+    border-color: var(--textColor);
+    opacity: .3;
+    margin-block-start: 20px;
+    margin-block-end: 20px;
+}
+a {
+    color: var(--linkColor);
+    transition: color 0.5s;
+}
+a:visited {
+    color: var(--linkColor);
+}
+@media (hover: hover) and (pointer: fine) {
+    a:hover {
+        color: var(--linkHoverColor);
+    }
+}
+a:active {
+    color: var(--linkHoverColor);
+}
+
+
+.PageGroup {
+    width: 100%;
+    padding: 0 min(30px, 5%);
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+.PageGroup > button {
+    font-size: 16px;
+    width: 100%;
+    height: 45px;
+    margin: 10px 0;
+    border-radius: 8px;
+    padding: 1px max(10px, 8%);
+}
+.PageGroup h1 {
+    font-size: 25px;
+}
+.PageGroup p {
+    text-align: start;
+}
+.PageGroup h1, .PageGroup p, .PageGroup .SmallBtnGroup {
+    margin: 15px 0;
+}
+
+
+.SmallBtnGroup {
+    width: 100%;
+    /* display: flex;
+    flex-direction: row; */
+}
+.SmallBtnGroup button {
+    width: 40px;
+    height: 35px;
+    border-radius: 18px;
+}
+
+
+.button1 {
+    font-family: inherit;
+    background: none;
+    outline: none;
+    border: 3px solid var(--btnBorder);
+    color: var(--btnColor);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    white-space: nowrap;
+    font-weight: bold;
+    transition: background-color 0.5s, box-shadow 0.5s, color 0.5s, border 0.5s;
+    display: flex;
+    align-items: center;
+}
+@media (hover: hover) and (pointer: fine) {
+    .button1:enabled:hover {
+        color: var(--btnHoverColor);
+        border: 3px solid transparent;
+        background-color: var(--btnHoverBG);
+        box-shadow: 0 0 5px 2px var(--btnHoverShadow);
+        /* text-overflow: unset; */
+    }
+}
+.button1:enabled:active {
+    background-color: var(--btnActiveBG);
+    box-shadow: 0 0 5px 2px var(--btnActiveShadow);
+    /* overflow: visible; */
+}
+.button1:disabled {
+    border: 3px dashed rgba(163, 163, 163, 0.3);
+}
+
+.button1 img {
+    display: inline-block;
+    vertical-align: middle;
+    object-fit: contain;
+    width: 35px;
+    height: 18px;
+}
+.button1 span {
+    margin-left: 8px;
+}
+
+
+.button2 {
+    font-family: inherit;
+    background-color: var(--btn2BG);
+    border: none;
+    color: var(--btn2Color);
+    font-size: 16px;
+    box-shadow: 0 2px 5px 2px var(--btn2Shadow);
+    outline: none;
+    overflow: hidden;
+    /* border-radius: 20px; */
+    text-align: center;
+    padding: 0px 10px;
+    transition: box-shadow 0.5s, background-color 0.5s, color 0.5s;
+    display: inline-block;
+    margin: 0 5px;
+}
+@media (hover: hover) and (pointer: fine) {
+    .button2:hover {
+        background-color: var(--btn2HoverBG);
+        box-shadow: 0 0 5px 2px var(--btn2HoverShadow);
+        color: var(--btn2HoverColor);
+    }
+}
+.button2:active {
+    background-color: var(--btn2ActiveBG);
+    box-shadow: 0 0 5px 2px var(--btn2ActiveShadow);
+    color: var(--btn2ActiveColor);
+}
+
+.FloatWrapper {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    margin: 10px 20px;
+}
+.FloatWrapper button {
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+    padding: 3px;
+}
+/* .FloatWrapper button {
+    height: 20px;
+    background: none;
+    color: var(--btnHoverBG);
+    border: none;
+    text-shadow: var(--btnActiveShadow) 0 2px 4px;
+}
+.FloatWrapper button:hover {
+    color: var(--btnActiveBG);
+    text-shadow: var(--btnActiveShadow) 0 2px 4px;
+}
+.FloatWrapper button:active {
+} */
+
