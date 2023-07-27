@@ -14,12 +14,12 @@
     <meta property='og:type' content='website' />
     <link rel="icon" href="https://chp-rubicell.github.io/epshape/resources/favicon.png">
     <title>EP Shape Previewer</title>
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=23_0610" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=23_0727" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Inconsolata&display=swap" rel="stylesheet">
     <script src="resources/three.js"></script>
     <script src="resources/CSS2DRenderer.js"></script>
     <script src="resources/earcut.js"></script>
-    <script src="resources/iddLibrary.js?v=23_0706"></script>
+    <script src="resources/iddLibrary.js?v=23_0727"></script>
 </head>
 
 <body>
@@ -55,9 +55,9 @@
                 </div>
 
                 <div id="SettingsPanel" class="settingsPanel">
-                    <div id="SettingsCloseBtn" onclick="settingsPanelVisibility(0);"></div>
+                    <div class="settingsCloseBtn" onclick="settingsPanelVisibility(0);"></div>
 
-                    <div id="SettingsPanelContent">
+                    <div id="SettingsPanelContent" class="panelContent">
                         <!-- <input type="checkbox" name="xxx" value="yyy" checked> Test -->
                         <!-- <div class="settingsPanelBlock">
                             <h5>Zone Visibility</h5>
@@ -74,6 +74,34 @@
                     </div>
                 </div>
 
+                <div id="CommandPanel" class="settingsPanel">
+                    <div class="settingsCloseBtn" onclick="commandPanelVisibility(-1);"></div>
+
+                    <div id="CommandPanelContent" class="panelContent">
+                        <div class="settingsPanelBlock">
+                            <h5>Basics</h5>
+                            <ul>
+                                <li><b>help : </b>See the list of commands.</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Camera</h5>
+                            <ul>
+                                <li><b>camerafar + (num) : </b>Set camera frustum far plane to (num).</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Shadows</h5>
+                            <ul>
+                                <li><b>shadowalt + (num) : </b>Set shadow altitude to (num)°.</li>
+                                <li><b>shadowazm + (num) : </b>Set shadow azimuth to (num)°.</li>
+                                <li><b>shadowmapsize + (num) : </b>Set shadow map resolution to (num)×(num).</li>
+                                <li><b>shadowradius + (num) : </b>Set shadow map size to (num)×(num).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="CommandListener" class="settingsPanel"></div>
 
             </div>
@@ -83,7 +111,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;2023-07-17</b>
+                    UPDATED ON<b>&nbsp;&nbsp;2023-07-27</b>
                 </small></p>
             </div>
 
@@ -146,7 +174,7 @@
         }
         screenManager();
     </script>
-    <script src="resources/scripts.js?v=23_0706"></script>
+    <script src="resources/scripts.js?v=23_0727"></script>
     <script>
         const hoverBtn = document.getElementById('HoverBtnWrapper');
         hoverBtnMargin = Number(getComputedStyle(hoverBtn).margin.slice(0, -2));
@@ -212,6 +240,27 @@
             
                 default:
                     break;
+            }
+        }
+
+        const commandPanel = document.getElementById('CommandPanel');
+
+        commandPanelVisibility(-1);
+        
+        function commandPanelVisibility(toggle=0) {
+            if (toggle <= 0) {
+                // 모두 닫으려고 할 때
+                commandPanel.style.visibility = 'hidden';
+                commandPanel.style.opacity = 0;
+                commandPanel.classList.remove('fadein');
+                commandPanel.classList.add('fadeout');
+            }
+            else {
+                // 창이 닫혀있을 때
+                commandPanel.style.visibility = 'visible';
+                commandPanel.style.opacity = 1;
+                commandPanel.classList.remove('fadeout');
+                commandPanel.classList.add('fadein');
             }
         }
     </script>

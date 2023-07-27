@@ -289,11 +289,15 @@ document.onkeyup = function (event) {
             }
             break;
         case 'Escape':
+            commandPanelVisibility(-1);
             if (commandOn) {
                 commandOn = false;
                 commandListenerVisibility(0);
             }
-            else settingsPanelVisibility(0);
+            else {
+                if (idfName == '') settingsPanelVisibility(-1);
+                else settingsPanelVisibility(0);
+            }
             break;
         case 'Backspace':
             if (commandOn) {
@@ -456,7 +460,6 @@ function readFile (fileList) {
             return;
         }
         idfName = idfFile.name.slice(0, -4);
-        fileSelectorTag.innerHTML = idfFile.name;
         reader.readAsText(idfFile, "utf-8");
     }
 }
@@ -466,6 +469,7 @@ function loadFile (code) {
     transparencyOn = true;
     debugOn = false;
     parseIDF(code);
+    fileSelectorTag.innerHTML = (idfName=='') ? '' : idfName+'.idf';
     updateSettingsPanel();
     addModel();
 }
@@ -616,9 +620,10 @@ function parseIDF(code) {
                 || obj.toLowerCase().startsWith('Window,'.toLowerCase())
                 || obj.toLowerCase().startsWith('Window:'.toLowerCase())) {
             if (!alerted) {
-                window.alert('Currently only supports idf files using "BuildingSurface:Detailed".');
                 alerted = true;
+                idfName = '';
                 settingsPanelVisibility(-1);
+                window.alert('Currently only supports idf files using "BuildingSurface:Detailed".');
             }
             return;
         }
@@ -1440,9 +1445,14 @@ function runCommand(command='') {
     lastCommand = command;
     commandListener.classList.add('CommandSuccess');
     switch (command) {
+        //? 키워드 하나만 있는 명령어
         case 'test':
             console.log('TEST!');
             break;
+        case 'help':
+            commandPanelVisibility(1);
+            break;
+        //? 키워드 + 값 형태의 명령어
         default:
             if (!command.includes(' ')) {
                 lastCommand = ''
@@ -1451,13 +1461,22 @@ function runCommand(command='') {
                 return
             }
             log = command.match(/(\S+)\s+(\S+)/)
-            commandName = log[1];
-            commandVal = log[2];
+            var commandName = log[1];
+            var commandVal = log[2];
             lastCommand = commandName;
             switch (commandName) {
                 case 'test':
                     console.log('TEST! -', commandVal);
                     break;
+                //? Camera
+                case 'camerafar':
+                    commandVal = parseFloat(commandVal);
+                    if (commandVal < 1000) commandVal = 1000;
+                    camera.far = commandVal;
+                    camera.updateProjectionMatrix();
+                    updateCamera();
+                    break;
+                //? Shadows
                 case 'shadowalt':
                     commandVal = parseFloat(commandVal);
                     shadowOffset[0] = commandVal;
