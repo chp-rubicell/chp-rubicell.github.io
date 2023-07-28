@@ -19,7 +19,7 @@
     <script src="resources/three.js"></script>
     <script src="resources/CSS2DRenderer.js"></script>
     <script src="resources/earcut.js"></script>
-    <script src="resources/iddLibrary.js?v=23_0727"></script>
+    <script src="resources/iddLibrary.js?v=23_0728"></script>
 </head>
 
 <body>
@@ -111,7 +111,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;2023-07-27</b>
+                    UPDATED ON<b>&nbsp;&nbsp;2023-07-28</b>
                 </small></p>
             </div>
 
@@ -174,7 +174,7 @@
         }
         screenManager();
     </script>
-    <script src="resources/scripts.js?v=23_0727"></script>
+    <script src="resources/scripts.js?v=23_0728"></script>
     <script>
         const hoverBtn = document.getElementById('HoverBtnWrapper');
         hoverBtnMargin = Number(getComputedStyle(hoverBtn).margin.slice(0, -2));
@@ -249,14 +249,16 @@
         
         function commandPanelVisibility(toggle=0) {
             if (toggle <= 0) {
-                // 모두 닫으려고 할 때
+                // 창 닫으려고 할 때
+                clickable = true;
                 commandPanel.style.visibility = 'hidden';
                 commandPanel.style.opacity = 0;
                 commandPanel.classList.remove('fadein');
                 commandPanel.classList.add('fadeout');
             }
             else {
-                // 창이 닫혀있을 때
+                // 창 열려고 할 때
+                clickable = false;
                 commandPanel.style.visibility = 'visible';
                 commandPanel.style.opacity = 1;
                 commandPanel.classList.remove('fadeout');

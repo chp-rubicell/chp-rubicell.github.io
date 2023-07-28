@@ -466,6 +466,7 @@ function readFile (fileList) {
 
 function loadFile (code) {
     settingsPanelVisibility(0);
+    commandPanelVisibility(0);
     transparencyOn = true;
     debugOn = false;
     parseIDF(code);
@@ -558,15 +559,16 @@ function parseIDF(code) {
             var version = obj.split(',')[1].split('.');
             console.log(version);
             v = [parseInt(version[0]), parseInt(version[1])]
-            for (let iter = 0; iter < 10; iter++) {
-                versionCode = v[0] + '_' + v[1] + '_0';
-                if (versionCode in versionLibrary) {
-                    break;
+            versionCode = v[0] + '_' + v[1] + '_0';
+            if (!(versionCode in versionLibrary)) {
+                if (v[0] <= 7) {
+                    versionCode = '7_2_0';
                 }
                 else {
-                    v[1]--;
+                    versionCode = Object.keys(versionLibrary)[Object.keys(versionLibrary).length - 1];
                 }
             }
+            console.log(versionCode + '.idd used.');
             break;
         }
     }
