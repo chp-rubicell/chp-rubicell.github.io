@@ -106,6 +106,7 @@ function polarCoord(alt, azm) {
                              Math.sin(altR));
 }
 
+var maxZoom = 950;
 var shadowOffset = new Array(45, 90);
 function updateCamera() {
     // if (camera.alt > 90) camera.alt = 90;
@@ -113,7 +114,7 @@ function updateCamera() {
     camera.alt = clamp(camera.alt, -90, 90);
 
     // if (camera.radius < 1) camera.radius = 1;
-    camera.radius = clamp(camera.radius, 1, 950);
+    camera.radius = clamp(camera.radius, 1, maxZoom);
 
     camera.azm %= 360;
     var displayAzm = camera.azm;
@@ -394,6 +395,7 @@ function triangulateSurface(vertList, vertical=false, holes=null) {
         if (rotateVecVert.length < 2) {
             // console.log(vertList);
             console.error(rotateVecVert);
+            return [];
         }
 
         // 바닥과 접하는 벡터
@@ -738,8 +740,6 @@ function parseIDF(code) {
             case 'Shading:Building:Detailed'.toLowerCase():
                 iddInfo = iddInfoLibrary['Shading:Building:Detailed'.toLowerCase()];
 
-                zoneName = objSplit[iddInfo.indexOf('zone name')];
-
                 var vCoordStart = iddInfo.indexOf('vertex 1 x-coordinate');
                 var vertNum = parseInt((objSplit.length-vCoordStart) / 3);  // 점 개수
                 var surfVertices = [];  // 점 좌표 리스트
@@ -747,8 +747,7 @@ function parseIDF(code) {
                 for (var v=0; v<vertNum; v++) {
                     var vCoord = [];  // 점 하나 좌표
                     for (var axis=0; axis<3; axis++) {
-                        coordRelative = Number(objSplit[vCoordStart + v*3 + axis]);  // 현재 좌푯값
-                        var coord = zoneCoord[axis] + coordRelative;  // zone 기준점 반영한 좌푯값
+                        var coord = Number(objSplit[vCoordStart + v*3 + axis]);  // 현재 좌푯값
                         // boundary 양쪽 끝 점 업데이트
                         if (coord < boundary[0][axis]) boundary[0][axis] = coord;
                         if (coord > boundary[1][axis]) boundary[1][axis] = coord;
@@ -1104,7 +1103,7 @@ function addModel() {
         const vertShade = new Float32Array(
             triangulateSurface(
                 shadeProp.Vertices,
-                true,
+                // true,
             ).flat()
         );
         shadeGeom.setAttribute('position', new THREE.BufferAttribute(vertShade, 3));
@@ -1475,6 +1474,14 @@ function runCommand(command='') {
                     commandVal = parseFloat(commandVal);
                     if (commandVal < 1000) commandVal = 1000;
                     camera.far = commandVal;
+                    camera.updateProjectionMatrix();
+                    updateCamera();
+                    break;
+                case 'maxzoom':
+                    commandVal = parseFloat(commandVal);
+                    if (commandVal < 950) commandVal = 950;
+                    maxZoom = commandVal;
+                    camera.far = commandVal+50;
                     camera.updateProjectionMatrix();
                     updateCamera();
                     break;
