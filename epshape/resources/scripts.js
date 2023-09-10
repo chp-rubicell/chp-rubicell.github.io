@@ -949,6 +949,8 @@ const matGhost = new THREE.MeshBasicMaterial({
     blending: THREE.AdditiveBlending
 });
 
+var _shade_vert = true;
+
 function addModel() {
     resetScene();
 
@@ -1103,7 +1105,7 @@ function addModel() {
         const vertShade = new Float32Array(
             triangulateSurface(
                 shadeProp.Vertices,
-                // true,
+                _shade_vert,
             ).flat()
         );
         shadeGeom.setAttribute('position', new THREE.BufferAttribute(vertShade, 3));
@@ -1484,6 +1486,23 @@ function runCommand(command='') {
                     camera.far = commandVal+50;
                     camera.updateProjectionMatrix();
                     updateCamera();
+                    break;
+                //? Model
+                case 'shadetilt':
+                    if (commandVal.toLowerCase().startsWith('v')) {
+                        _shade_vert = true;
+                        addModel();
+                    }
+                    else if (commandVal.toLowerCase().startsWith('h')) {
+                        _shade_vert = false;
+                        addModel();
+                    }
+                    else {
+                        lastCommand = ''
+                        commandListener.classList.remove('CommandSuccess');
+                        commandListener.classList.add('CommandFail');
+                        return
+                    }
                     break;
                 //? Shadows
                 case 'shadowalt':
