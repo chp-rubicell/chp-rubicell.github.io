@@ -14,8 +14,10 @@
     <meta property='og:type' content='website' />
     <link rel="icon" href="https://chp-rubicell.github.io/epshape/resources/favicon.png">
     <title>EP Shape Previewer</title>
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=23_0727" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Inconsolata&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=23_1130" />
     <script src="resources/three.js"></script>
     <script src="resources/CSS2DRenderer.js"></script>
     <script src="resources/earcut.js"></script>
@@ -31,7 +33,7 @@
 
     <div id="PageWrapper">
 
-        <div id="MainPanel"">
+        <div id="MainPanel">
 
             <h2>
                 <img height="40px" src="resources/eplogo.png" style="vertical-align: middle;"/>
@@ -45,6 +47,8 @@
             </div>
 
             <div id="CanvasContainer" oncontextmenu="return false;" style="position: relative; background-color: white;" draggable="false">
+
+                <div id="objectDisplay" class="whitemode"></div>
 
                 <div id="fileHover" class="bg" style="background: radial-gradient(#000000a0, #00000000); z-index: 20; display: none;"><p id="fileHoverText">drop to load file</p></div>
                 
@@ -92,12 +96,6 @@
                             </ul>
                         </div>
                         <div class="settingsPanelBlock">
-                            <h5>Model</h5>
-                            <ul>
-                                <li><b>shadetilt + (v/h) : </b>Set shade tilt angle to either vertical or horizontal.</li>
-                            </ul>
-                        </div>
-                        <div class="settingsPanelBlock">
                             <h5>Shadows</h5>
                             <ul>
                                 <li><b>shadowalt + (num) : </b>Set shadow altitude to (num)°.</li>
@@ -118,7 +116,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;2023-09-11</b>
+                    UPDATED ON<b>&nbsp;&nbsp;2023-11-30</b>
                 </small></p>
             </div>
 
@@ -147,17 +145,19 @@
 
         const MainPanel = document.getElementById('MainPanel');
         const CanvasContainer = document.getElementById("CanvasContainer");
-        const CanvasRenderer = document.getElementById("CanvasRenderer");
+        // const CanvasRenderer = document.getElementById("CanvasRenderer");
 
         CanvasContainer.style.width = panelWidth+"px";
         CanvasContainer.style.height = panelHeight+"px";
+        
+        var mainPanelWidth = 0;
+        var mainPanelHeight = 0;
 
         window.onresize = screenManager;
 
         function screenManager() {
             var screenWidth = document.body.clientWidth - pad * 2;
             var mainPanelLeft = 0;
-            var mainPanelWidth = 0;
 
             if(screenWidth < minWidth) {
                 mainPanelLeft = pad;
@@ -171,17 +171,18 @@
                 mainPanelLeft = pad + (screenWidth - maxWidth) / 2;
                 mainPanelWidth = maxWidth;
             }
+            mainPanelHeight = parseInt(mainPanelWidth * canvHeight / canvWidth);
             MainPanel.style.marginLeft = mainPanelLeft + 'px';
             MainPanel.style.marginRight = mainPanelLeft + 'px';
             MainPanel.style.width = mainPanelWidth + 'px';
             CanvasContainer.style.width = mainPanelWidth + 'px';
-            CanvasContainer.style.height = mainPanelWidth * canvHeight / canvWidth + 'px';
+            CanvasContainer.style.height = mainPanelHeight + 'px';
             // CanvasRenderer.style.width = mainPanelWidth + 'px';
             // CanvasRenderer.style.height = mainPanelWidth * canvHeight / canvWidth + 'px';
         }
         screenManager();
     </script>
-    <script src="resources/scripts.js?v=23_0911"></script>
+    <script src="resources/scripts.js?v=23_1130"></script>
     <script>
         const hoverBtn = document.getElementById('HoverBtnWrapper');
         hoverBtnMargin = Number(getComputedStyle(hoverBtn).margin.slice(0, -2));
