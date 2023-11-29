@@ -10,6 +10,10 @@ Math.radians = function(degrees) {
 Math.degrees = function(radians) {
     return radians * 180 / Math.PI;
 }
+// Clamp number between two values with the following line:
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+const THRESHOLD = 10e-5;
 
 
 //! =========================== Scene Setup =========================== !//
@@ -78,12 +82,13 @@ labelRenderer.domElement.style.pointerEvents = 'none';
 document.getElementById('CanvasContainer').appendChild(labelRenderer.domElement);
 */
 
-const renderCanvas = document.getElementById('CanvasRenderer');
+// const CanvasRenderer = document.getElementById('CanvasRenderer');
+const CanvasRenderer = renderer.domElement;
 
 function exportImage() {
     console.log('exporting image...');
 
-    var image = renderCanvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+    var image = CanvasRenderer.toDataURL('image/png').replace('image/png', 'image/octet-stream');
     var link = document.createElement("a");
     link.setAttribute("href", image);
     link.setAttribute("download", idfName + ".png");
@@ -93,9 +98,6 @@ function exportImage() {
 }
 
 //! ============================== Camera ============================= !//
-
-// Clamp number between two values with the following line:
-const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 function polarCoord(alt, azm) {
     var altR = Math.radians(alt);
@@ -242,6 +244,87 @@ document.getElementById('PageWrapper').onmousedown = function (event) {
         return false;
     }
 }
+//? Object selection
+const raycaster = new THREE.Raycaster();
+raycaster.layers.set(1); 
+const pointer = new THREE.Vector2();
+const objectDisplay = document.getElementById('objectDisplay')
+var lastSelectedObj = null;
+var lastSelectedObjMat = null;
+const matHighlighted = new THREE.MeshPhongMaterial({color: '#ff0000', side: THREE.DoubleSide, opacity: 0.7, transparent: true})
+
+function objectSelection(event) {
+    // calculate pointer position in normalized device coordinates
+    const rect = event.target.getBoundingClientRect();
+    const x = event.pageX - rect.left;
+    const y = event.pageY - rect.top;
+    // (-1 to +1) for both components
+    const offsetX = clamp(x/mainPanelWidth, 0, 1) * 2 - 1;
+    const offsetY = -clamp(y/mainPanelHeight, 0, 1) * 2 + 1;
+    pointer.x = offsetX;
+    pointer.y = offsetY;
+    
+    // update the picking ray with the camera and pointer position
+    raycaster.setFromCamera(pointer, camera);
+
+    // calculate objects intersecting the picking ray
+    const intersects = raycaster.intersectObjects(scene.children);
+
+    if (lastSelectedObj !== null) {
+        lastSelectedObj.material = lastSelectedObjMat;
+    }
+    if (intersects.length == 0) {
+        objectDisplay.innerHTML = '';
+    }
+    else {
+        obj = intersects[0].object;
+        // obj.material.color.set(0xff0000);
+        lastSelectedObj = obj;
+        lastSelectedObjMat = obj.material.clone();
+        // obj.material.color.set(0xff0000);
+        obj.material = matHighlighted;
+
+        var objName = obj.sourceObjName;
+        selectedObjName = objName;
+        var objType = obj.sourceObjType;
+        var objProp = {};
+        
+        displayText = '<b>[Name]</b> ' + objName;
+        switch (objType) {
+            case 'surface':
+                objProp = surfList[objName];
+                displayText += `<br><b>[Type]</b> ${objType} (${objProp.SurfaceType})`;
+                displayText += '<br><b>[Construction]</b> ' + objProp.Construction;
+                displayText += '<br><b>[Zone]</b> ' + objProp.ZoneName;
+                displayText += '<br>  └─<b>[Surface]</b> ' + objName;
+                break;
+            case 'fenestration':
+                objProp = fenList[objName];
+                displayText += `<br><b>[Type]</b> ${objType} (${objProp.SurfaceType})`;
+                displayText += '<br><b>[Construction]</b> ' + objProp.Construction;
+                displayText += '<br><b>[Zone]</b> ' + surfList[objProp.SurfaceName].ZoneName;
+                displayText += '<br>  └─<b>[Surface]</b> ' + objProp.SurfaceName;
+                displayText += '<br>     └─<b>[Fenestration]</b> ' + objName;
+                break;
+            case 'shading':
+                objProp = shadeList[objName];
+                displayText += '<br><b>[Type]</b> ' + objType;
+                break;
+        }
+        displayText = displayText.replaceAll(' ', '&nbsp;')
+        objectDisplay.innerHTML = displayText;
+    }
+
+    updateCamera();
+}
+// CanvasContainer.addEventListener('pointermove', objectSelection);
+CanvasRenderer.addEventListener('pointerleave', function() {
+    if (lastSelectedObj !== null) {
+        lastSelectedObj.material = lastSelectedObjMat;
+        updateCamera();
+    }
+    objectDisplay.innerHTML = '';
+})
 
 document.onkeydown = function (event) {
     if (event.shiftKey) shiftKey = true;
@@ -372,68 +455,77 @@ resetScene();
 
 //! ======================= Triangulate Surface ======================= !//
 
-function triangulateSurface(vertList, vertical=false, holes=null) {
-    if (vertical) {
-        //? 면이 수직일 때
-
-        var minZ = Infinity
-        var rotateVecVert = [];
-        var vectorList = []
-
-        vertList.forEach(v => {
-            newVec = new THREE.Vector3(v[0], v[1], v[2]);
-            if (v[2] < minZ) {
-                minZ = v[2];
-                rotateVecVert = [newVec];
-            }
-            else if (rotateVecVert.length < 2 && v[2] == minZ) {
-                rotateVecVert.push(newVec);
-                // return false;
-            }
-            vectorList.push(newVec);
-        });
-        if (rotateVecVert.length < 2) {
-            // console.log(vertList);
-            console.error(rotateVecVert);
-            return [];
-        }
-
-        // 바닥과 접하는 벡터
-        rotateVec = new THREE.Vector3().subVectors(rotateVecVert[0], rotateVecVert[1]);
-        const unitX = new THREE.Vector3(1, 0, 0);
-        const unitZ = new THREE.Vector3(0, 0, 1);
-        // x축과 평행하도록 회전시켜야하는 각도
-        var ang1 = Math.acos(unitX.dot(rotateVec) / rotateVec.length());
-
-        var vertListHor = [];
-        vectorList.forEach(vec => {
-            vec.applyAxisAngle(unitZ, ang1);  // x축과 평행하도록 회전
-            vec.applyAxisAngle(unitX, Math.PI / 2);  // 수평이 되도록 회전
-            vertListHor.push([vec.x, vec.y, vec.z]);
-            // vertListHor.push([vec.x, vec.y, minZ]);
-        });
-        vertListHorTrian = triangulateSurface(vertListHor, vertical=false, holes=holes);
-
-        var vertListVerTrian = []
-        vertListHorTrian.forEach(v => {
-            vec = new THREE.Vector3(v[0], v[1], v[2]);
-            vec.applyAxisAngle(unitX, -Math.PI / 2);
-            vec.applyAxisAngle(unitZ, -ang1);
-            vertListVerTrian.push([vec.x, vec.y, vec.z]);
-        });
-        return vertListVerTrian;
-    }
-
-    else {
-        //? 면이 수평일 때
-        var vertTriangulated = [];
-        earcut(vertList.flat(), holes, 3).forEach(vIdx => {
-            vertTriangulated.push(vertList[vIdx]);
-        });
-        return vertTriangulated
-    }
+//? 수평한 점 리스트로부터 triangulate된 리스트 생성
+function triangulateSurfacefromFlatVertlist(vertList, holes=null) {
+    var vertTriangulated = [];
+    earcut(vertList.flat(), holes, 3).forEach(vIdx => {
+        vertTriangulated.push(vertList[vIdx]);
+    });
+    return vertTriangulated
 }
 
+//? 점 리스트로부터 triangulate된 서피스 생성
+function triangulatedSurfacefromVertlist(vertList, holes=null) {
+
+    const unitX = new THREE.Vector3(1, 0, 0);
+    const unitZ = new THREE.Vector3(0, 0, 1);
+    
+    //? 면의 법선 벡터 계산
+    // (첫 번째 점 -> 두 번째 점) 벡터와 (첫 번째 점 -> n 번째 점) 벡터의 cross product 계산 (법선 벡터)
+    var surf_normvec = new THREE.Vector3();  // surface의 법선 벡터
+    var vert1 = new THREE.Vector3(...vertList[0]);
+    var vert2 = new THREE.Vector3(...vertList[1]);
+    var vec1 = new THREE.Vector3().subVectors(vert2, vert1);
+    for (let i = 2; i < vertList.length; i++) {
+        var vert3 = new THREE.Vector3(...vertList[i]);
+        var vec2 = new THREE.Vector3().subVectors(vert3, vert1);
+        surf_normvec = new THREE.Vector3().crossVectors(vec2, vec1);
+        if (surf_normvec.length() > THRESHOLD) {
+            // 두 벡터가 일직선이 아님
+            break;
+        }
+    }
+
+    //? 서피스 생성
+    var surfGeom = new THREE.BufferGeometry();
+
+    surf_normvec.normalize();
+    if (new THREE.Vector3().crossVectors(surf_normvec, unitZ).length() < THRESHOLD) {
+        // 이미 수평일 때
+        var vertSurf = new Float32Array(
+            triangulateSurfacefromFlatVertlist(
+                vertList,
+                holes
+            ).flat()
+        );
+        surfGeom.setAttribute('position', new THREE.BufferAttribute(vertSurf, 3));
+    }
+    else {
+        // 수평이 아닐 때
+        var quaternion = new THREE.Quaternion();  // 평면을 회전시킬 quaternion
+        quaternion.setFromUnitVectors(surf_normvec, unitZ);
+        
+        var vertListHor = [];
+        vertList.forEach(v => {
+            vec = new THREE.Vector3(...v);
+            vec.applyQuaternion(quaternion);
+            vertListHor.push([vec.x, vec.y, vec.z]);
+        });
+        var vertSurf = new Float32Array(
+            triangulateSurfacefromFlatVertlist(
+                vertListHor,
+                holes
+            ).flat()
+        );
+        surfGeom.setAttribute('position', new THREE.BufferAttribute(vertSurf, 3));
+        quaternion.invert();  // 회전을 반대 방향으로
+        surfGeom.applyQuaternion(quaternion);
+    }
+
+    surfGeom.computeVertexNormals();
+
+    return surfGeom;
+}
 
 //! ========================== Load IDF File ========================== !//
 
@@ -467,14 +559,18 @@ function readFile (fileList) {
 }
 
 function loadFile (code) {
+    CanvasRenderer.removeEventListener('pointermove', objectSelection);
     settingsPanelVisibility(0);
     commandPanelVisibility(0);
     transparencyOn = true;
     debugOn = false;
+    lastSelectedObj = null;  // highlighted objects
+    lastSelectedObjMat = null;  // highlighted objects
     parseIDF(code);
     fileSelectorTag.innerHTML = (idfName=='') ? '' : idfName+'.idf';
     updateSettingsPanel();
     addModel();
+    CanvasRenderer.addEventListener('pointermove', objectSelection);
 }
 
 const reader = new FileReader();
@@ -1009,8 +1105,6 @@ function addModel() {
     for (const [surfName, surfProp] of Object.entries(surfList)) {
 
         //? Surface 면 생성
-        const surfGeom = new THREE.BufferGeometry();
-
         var vertList = surfProp.Vertices;
         if (surfProp.Fenestrations.length > 0) {
             // 만약 surface에 창문이 있다면, 구멍을 추가
@@ -1025,16 +1119,7 @@ function addModel() {
             var holes = null;
         }
 
-        const vertSurf = new Float32Array(
-            triangulateSurface(
-                vertList,
-                surfProp.SurfaceType == 'wall',
-                holes
-            ).flat()
-        );
-        surfGeom.setAttribute('position', new THREE.BufferAttribute(vertSurf, 3));
-        surfGeom.computeVertexNormals();
-
+        const surfGeom = triangulatedSurfacefromVertlist(vertList, holes);
         surfList[surfName].Geometries = surfGeom;
 
         //? Surface 테두리 생성
@@ -1048,13 +1133,7 @@ function addModel() {
 
         //? Surface 그림자 생성용 geometry 생성
         if (surfList[surfName].MaximumZ > boundary[0][2]) {  // shadow catcher와 겹치지 않을 경우
-            var surfShadGeom = new THREE.BufferGeometry();
-            var vertSurfShad = new Float32Array(
-                triangulateSurface(surfProp.Vertices, surfProp.SurfaceType == 'wall').flat()
-            );  // 구멍 뚫리지 않은 surface
-            surfShadGeom.setAttribute('position', new THREE.BufferAttribute(vertSurfShad, 3));
-            surfShadGeom.computeVertexNormals();
-
+            var surfShadGeom = triangulatedSurfacefromVertlist(surfProp.Vertices);
             var surfShadObj = new THREE.Mesh(surfShadGeom, matGhost);
             surfShadObj.castShadow = true;
             surfShadObj.material.colorWrite = false;
@@ -1071,14 +1150,7 @@ function addModel() {
     for (const [fenName, fenProp] of Object.entries(fenList)) {
 
         //? Fenestration 면 생성
-        const fenGeom = new THREE.BufferGeometry();
-        const vertFen = new Float32Array(
-            triangulateSurface(
-                fenProp.Vertices,
-                true,
-            ).flat()
-        );
-        fenGeom.setAttribute('position', new THREE.BufferAttribute(vertFen, 3));
+        const fenGeom = triangulatedSurfacefromVertlist(fenProp.Vertices);
         fenGeom.computeVertexNormals();
 
         fenList[fenName].Geometries = fenGeom;
@@ -1099,14 +1171,7 @@ function addModel() {
     for (const [shadeName, shadeProp] of Object.entries(shadeList)) {
 
         //? Shading 면 생성
-        const shadeGeom = new THREE.BufferGeometry();
-        const vertShade = new Float32Array(
-            triangulateSurface(
-                shadeProp.Vertices,
-                // true,
-            ).flat()
-        );
-        shadeGeom.setAttribute('position', new THREE.BufferAttribute(vertShade, 3));
+        const shadeGeom = triangulatedSurfacefromVertlist(shadeProp.Vertices);
         shadeGeom.computeVertexNormals();
 
         shadeList[shadeName].Geometries = shadeGeom;
@@ -1277,7 +1342,11 @@ function renderModel() {
             }
             matSurf.transparent = false;
         }
-        const surfMesh = new THREE.Mesh(surfGeom, matSurf)
+        const surfMesh = new THREE.Mesh(surfGeom, matSurf);
+        surfMesh.layers.enable(1);  // for mouse selection
+        surfMesh.sourceObjName = surfName;
+        surfMesh.sourceObjType = 'surface';
+        
         scene.add(surfMesh);  //!!!!!
 
         /*
@@ -1329,8 +1398,12 @@ function renderModel() {
             }
             matFen.transparent = false;
         }
-        scene.add(new THREE.Mesh(fenGeom, matFen));  //!!!!!
-
+        const fenMesh = new THREE.Mesh(fenGeom, matFen);
+        fenMesh.layers.enable(1);  // for mouse selection
+        fenMesh.sourceObjName = fenName;
+        fenMesh.sourceObjType = 'fenestration';
+        
+        scene.add(fenMesh);  //!!!!!
         scene.add(fenProp.EdgeObjects);
     }
 
@@ -1360,8 +1433,12 @@ function renderModel() {
                 }
                 matShade.transparent = false;
             }
-            scene.add(new THREE.Mesh(shadeGeom, matShade));  //!!!!!
+            const shadeMesh = new THREE.Mesh(shadeGeom, matShade);
+            shadeMesh.layers.enable(1);  // for mouse selection
+            shadeMesh.sourceObjName = shadeName;
+            shadeMesh.sourceObjType = 'shading';
 
+            scene.add(shadeMesh);  //!!!!!
             scene.add(shadeProp.EdgeObjects);
         }
     }
@@ -1399,16 +1476,19 @@ function changeBackgroundColor(color=-1, eventBtn=null) {
         case -1:
             // transparent
             CanvasContainer.style.backgroundColor = '';
+            objectDisplay.className = 'transparentmode';
             console.log('Background changed to "transparent"');
             break;
         case 0:
             // black
             CanvasContainer.style.backgroundColor = 'black';
+            objectDisplay.className = 'blackmode';
             console.log('Background changed to "black"');
             break;
         case 1:
             //white
             CanvasContainer.style.backgroundColor = 'white';
+            objectDisplay.className = 'whitemode';
             console.log('Background changed to "white"');
             break;
     }
@@ -1485,6 +1565,7 @@ function runCommand(command='') {
                     camera.updateProjectionMatrix();
                     updateCamera();
                     break;
+                //? Model
                 //? Shadows
                 case 'shadowalt':
                     commandVal = parseFloat(commandVal);
