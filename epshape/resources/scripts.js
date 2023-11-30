@@ -248,12 +248,17 @@ document.getElementById('PageWrapper').onmousedown = function (event) {
 const raycaster = new THREE.Raycaster();
 raycaster.layers.set(1); 
 const pointer = new THREE.Vector2();
-const objectDisplay = document.getElementById('objectDisplay')
+const objectDisplay = document.getElementById('objectDisplay');
+var lastHighlightedObj = null;
+var lastHighlightedObjMat = null;
+const matHighlighted = new THREE.MeshPhongMaterial({color: '#ffffff', side: THREE.DoubleSide, opacity: 0.7, transparent: true});
+var highlightedObjDisplayText = '';
 var lastSelectedObj = null;
 var lastSelectedObjMat = null;
-const matHighlighted = new THREE.MeshPhongMaterial({color: '#ff0000', side: THREE.DoubleSide, opacity: 0.7, transparent: true})
+const matSelected = new THREE.MeshPhongMaterial({color: '#ff0000', side: THREE.DoubleSide, opacity: 0.8, transparent: true});
+var selectedObjDisplayText = '';
 
-function objectSelection(event) {
+function objectHighlight(event) {
     // calculate pointer position in normalized device coordinates
     const rect = event.target.getBoundingClientRect();
     const x = event.pageX - rect.left;
@@ -270,8 +275,11 @@ function objectSelection(event) {
     // calculate objects intersecting the picking ray
     const intersects = raycaster.intersectObjects(scene.children);
 
-    if (lastSelectedObj !== null) {
-        lastSelectedObj.material = lastSelectedObjMat;
+    if (lastHighlightedObj !== null) {
+        lastHighlightedObj.material = lastHighlightedObjMat;
+        if (lastSelectedObj !== null) {
+            lastSelectedObj.material = matSelected;
+        }
     }
     if (intersects.length == 0) {
         objectDisplay.innerHTML = '';
@@ -279,8 +287,8 @@ function objectSelection(event) {
     else {
         obj = intersects[0].object;
         // obj.material.color.set(0xff0000);
-        lastSelectedObj = obj;
-        lastSelectedObjMat = obj.material.clone();
+        lastHighlightedObj = obj;
+        lastHighlightedObjMat = obj.material.clone();
         // obj.material.color.set(0xff0000);
         obj.material = matHighlighted;
 
@@ -289,7 +297,7 @@ function objectSelection(event) {
         var objType = obj.sourceObjType;
         var objProp = {};
         
-        displayText = '<b>[Name]</b> ' + objName;
+        var displayText = '<b>[Name]</b> ' + objName;
         switch (objType) {
             case 'surface':
                 objProp = surfList[objName];
@@ -313,19 +321,52 @@ function objectSelection(event) {
         }
         displayText = displayText.replaceAll(' ', '&nbsp;')
         objectDisplay.innerHTML = displayText;
+        highlightedObjDisplayText = displayText;
     }
 
     updateCamera();
 }
-// CanvasContainer.addEventListener('pointermove', objectSelection);
+// CanvasContainer.addEventListener('pointermove', objectHighlight);
 CanvasRenderer.addEventListener('pointerleave', function() {
-    if (lastSelectedObj !== null) {
-        lastSelectedObj.material = lastSelectedObjMat;
+    if (lastHighlightedObj !== null) {
+        lastHighlightedObj.material = lastHighlightedObjMat;
         updateCamera();
     }
     objectDisplay.innerHTML = '';
 })
 
+// function objSelectionPointerDown(event) {
+//     CanvasRenderer.addEventListener('pointermove', objSelectionPointerMove);
+//     CanvasRenderer.addEventListener('pointerup', objSelectionPointerUp);
+// }
+// function objSelectionPointerMove(event) {
+//     CanvasRenderer.removeEventListener('pointermove', objectHighlight);
+//     lastHighlightedObj.material = lastHighlightedObjMat;
+//     lastHighlightedObj = null;
+//     lastHighlightedObjMat = null;
+// }
+// function objSelectionPointerUp(event) {
+//     CanvasRenderer.addEventListener('pointermove', objectHighlight);
+//     CanvasRenderer.removeEventListener('pointermove', objSelectionPointerMove);
+//     // console.log
+//     if (lastHighlightedObj !== null) {
+//         lastHighlightedObj.material = lastHighlightedObjMat;
+//         if (lastSelectedObj !== null) {
+//             lastSelectedObj.material = lastSelectedObjMat;
+//         }
+//         lastSelectedObj = lastHighlightedObj;
+//         lastSelectedObjMat = lastSelectedObj.material.clone();
+//         lastSelectedObj.material = matSelected;
+//         updateCamera();
+//     }
+//     else {
+//         lastSelectedObj.material = lastSelectedObjMat;
+//         lastSelectedObj = null;
+//     }
+//     CanvasRenderer.removeEventListener('pointerup', objSelectionPointerUp);
+// }
+
+//? Keyboard
 document.onkeydown = function (event) {
     if (event.shiftKey) shiftKey = true;
     if (mouseLeft && event.shiftKey) {
@@ -559,18 +600,20 @@ function readFile (fileList) {
 }
 
 function loadFile (code) {
-    CanvasRenderer.removeEventListener('pointermove', objectSelection);
+    CanvasRenderer.removeEventListener('pointermove', objectHighlight);
+    // CanvasRenderer.removeEventListener('pointerdown', objSelectionPointerDown);
     settingsPanelVisibility(0);
     commandPanelVisibility(0);
     transparencyOn = true;
     debugOn = false;
-    lastSelectedObj = null;  // highlighted objects
-    lastSelectedObjMat = null;  // highlighted objects
+    lastHighlightedObj = null;  // highlighted objects
+    lastHighlightedObjMat = null;  // highlighted objects
     parseIDF(code);
     fileSelectorTag.innerHTML = (idfName=='') ? '' : idfName+'.idf';
     updateSettingsPanel();
     addModel();
-    CanvasRenderer.addEventListener('pointermove', objectSelection);
+    CanvasRenderer.addEventListener('pointermove', objectHighlight);
+    // CanvasRenderer.addEventListener('pointerdown', objSelectionPointerDown);
 }
 
 const reader = new FileReader();

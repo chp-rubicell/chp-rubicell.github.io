@@ -560,7 +560,7 @@ button.settingsPanel:active, .customButton:focus {
     position: absolute;
     top: 0px;
     left: 0px;
-    margin-top: 5px;
+    margin-top: 6px;
     margin-left: 10px;
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
@@ -568,14 +568,14 @@ button.settingsPanel:active, .customButton:focus {
 }
 #objectDisplay.whitemode {
     color: black;
-    text-shadow: #ffffff 0 0 2px, #ffffff 0 0 5px;
+    text-shadow: #ffffff 0 0 4px, #ffffff 0 0 15px;
 }
 #objectDisplay.whitemode b {
     color: #112C44e0;
 }
 #objectDisplay.blackmode {
     color: white;
-    text-shadow: #000000 0 0 2px, #000000 0 0 5px;
+    text-shadow: #000000 0 0 4px, #000000 0 0 15px;
 }
 #objectDisplay.blackmode b {
     color: #9EE3FFCC;
