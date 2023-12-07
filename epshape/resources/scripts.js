@@ -251,7 +251,7 @@ const pointer = new THREE.Vector2();
 const objectDisplay = document.getElementById('objectDisplay');
 var lastHighlightedObj = null;
 var lastHighlightedObjMat = null;
-const matHighlighted = new THREE.MeshPhongMaterial({color: '#ffffff', side: THREE.DoubleSide, opacity: 0.7, transparent: true});
+const matHighlighted = new THREE.MeshPhongMaterial({color: '#ff0000', side: THREE.DoubleSide, opacity: 0.7, transparent: true});
 var highlightedObjDisplayText = '';
 var lastSelectedObj = null;
 var lastSelectedObjMat = null;
@@ -1301,6 +1301,7 @@ const matDefault = {
     'Door': new THREE.MeshPhongMaterial({color: '#1747d4', side: THREE.DoubleSide, opacity: 0.5}),
     'Shading': new THREE.MeshPhongMaterial({color: '#624285', side: THREE.DoubleSide, opacity: 0.7}),
     'Ground': new THREE.MeshLambertMaterial({color: '#555555', side: THREE.DoubleSide}),
+    'Disabled': new THREE.MeshPhongMaterial({color: '#bbbbbb', side: THREE.DoubleSide, opacity: 0.3}),
 }
 for (var mat in matDefault) {
     if (matDefault[mat].opacity < 1) {
@@ -1331,7 +1332,7 @@ function renderModel() {
     for (const [surfName, surfProp] of Object.entries(surfList)) {
 
         zoneName = surfProp.ZoneName;
-        if (!zoneList[zoneName].Visible) continue;
+        // if (!zoneList[zoneName].Visible) continue;
 
         surfGeom = surfProp.Geometries;  // 면 geometry 불러옴
 
@@ -1374,44 +1375,54 @@ function renderModel() {
         }
         */
         matSurf = matSurf.clone();
-        if (!transparencyOn) {
-            if (matSurf.opacity < 1) {
-                // matSurf.color = add_black_color_rgb(matSurf.color, matSurf.opacity);
-                matSurf.color = add_white_color_rgb(
-                    add_black_color_hex(matSurf.color, matSurf.opacity),
-                    1-(1-matSurf.opacity)/2.5
-                );
-                matSurf.opacity = 1;
+
+        if (zoneList[zoneName].Visible) {
+            if (!transparencyOn) {
+                if (matSurf.opacity < 1) {
+                    // matSurf.color = add_black_color_rgb(matSurf.color, matSurf.opacity);
+                    matSurf.color = add_white_color_rgb(
+                        add_black_color_hex(matSurf.color, matSurf.opacity),
+                        1-(1-matSurf.opacity)/2.5
+                    );
+                    matSurf.opacity = 1;
+                }
+                matSurf.transparent = false;
             }
-            matSurf.transparent = false;
+            const surfMesh = new THREE.Mesh(surfGeom, matSurf);
+            surfMesh.renderOrder = 0;
+            surfMesh.layers.enable(1);  // for mouse selection
+            surfMesh.sourceObjName = surfName;
+            surfMesh.sourceObjType = 'surface';
+            
+            scene.add(surfMesh);  //!!!!!
+
+            /*
+            TODO
+            surfMesh.layers.enableAll();
+            const earthDiv = document.createElement('div');
+            earthDiv.className = 'label';
+            earthDiv.textContent = 'Earth';
+            earthDiv.style.backgroundColor = 'transparent';
+            const earthLabel = new CSS2DObject(earthDiv);
+            earthLabel.position.set(0, 0, 0 );
+            // earthLabel.center.set(0, 0);
+            earthLabel.layers.set(0);
+            surfMesh.add(earthLabel);
+            */
+
+            // if (surfProp.SurfaceType != 'roof' && surfProp.SurfaceType != 'floor' && surfProp.SurfaceType != 'ceiling') {
+            //     scene.add(surfProp.EdgeObjects);
+            // }
+            scene.add(surfProp.EdgeObjects);
+
+            if (shadowOn && surfProp.ShadowObjects != null) scene.add(surfProp.ShadowObjects);
         }
-        const surfMesh = new THREE.Mesh(surfGeom, matSurf);
-        surfMesh.layers.enable(1);  // for mouse selection
-        surfMesh.sourceObjName = surfName;
-        surfMesh.sourceObjType = 'surface';
-        
-        scene.add(surfMesh);  //!!!!!
-
-        /*
-        TODO
-        surfMesh.layers.enableAll();
-        const earthDiv = document.createElement('div');
-        earthDiv.className = 'label';
-        earthDiv.textContent = 'Earth';
-        earthDiv.style.backgroundColor = 'transparent';
-        const earthLabel = new CSS2DObject(earthDiv);
-        earthLabel.position.set(0, 0, 0 );
-        // earthLabel.center.set(0, 0);
-        earthLabel.layers.set(0);
-        surfMesh.add(earthLabel);
-        */
-
-        // if (surfProp.SurfaceType != 'roof' && surfProp.SurfaceType != 'floor' && surfProp.SurfaceType != 'ceiling') {
-        //     scene.add(surfProp.EdgeObjects);
-        // }
-        scene.add(surfProp.EdgeObjects);
-
-        if (shadowOn && surfProp.ShadowObjects != null) scene.add(surfProp.ShadowObjects);
+        else {
+            const surfMesh = new THREE.Mesh(surfGeom, matDefault.Disabled);
+            surfMesh.renderOrder = 1;
+            surfMesh.layers.enable(2);  // disable mouse selection
+            scene.add(surfMesh);  //!!!!!
+        }
     }
 
     // Fenestration 렌더링 
