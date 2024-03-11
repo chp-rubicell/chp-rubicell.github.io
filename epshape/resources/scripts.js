@@ -373,11 +373,9 @@ document.onkeydown = function (event) {
         camStepped = true;
         updateCamera();
     }
-    /*
     if (event.key == 's' && idfName !== '' && !commandOn) {
         exportImage();
     }
-    */
 }
 const nonCommandKey = new Array('Shift', 'Alt', 'Control', 'Enter', 'Escape', 'Tab', 'CapsLock', 'ContextMenu');
 document.onkeyup = function (event) {
