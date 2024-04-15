@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+
+<title>Octopus Log to CSV</title>
+
+<head>
+
+    <meta charset = "UTF-8">
+
+<script>
+
+window.onresize = screenManager;
+
+function screenManager() {
+    var pad = 20;
+    var minWidth = 550;
+    var maxWidth = 750;
+    var screenWidth = document.body.clientWidth - pad * 2;
+    if(screenWidth < minWidth) {
+        document.getElementById('mainPanel').style.left = pad + 'px';
+        document.getElementById('mainPanel').style.width = minWidth + 'px';
+    }
+    else if(screenWidth < maxWidth) {
+        document.getElementById('mainPanel').style.left = pad + 'px';
+        document.getElementById('mainPanel').style.width = screenWidth + 'px';
+    }
+    else {
+        document.getElementById('mainPanel').style.left = pad + (screenWidth - maxWidth) / 2 + 'px';
+        document.getElementById('mainPanel').style.width = maxWidth + 'px';
+    }
+}
+
+var data = new Array();
+
+var dataParam = new Array();
+var dataObj = new Array();
+
+var paramNum = 0;
+var objNum = 0;
+
+var paramInfo = new Array();
+
+var paretoList = new Array();
+var nonParetoList = new Array();
+
+function initialize() {
+    data = new Array();
+
+    dataParam = new Array();
+    dataObj = new Array();
+
+    paramNum = 0;
+    objNum = 0;
+
+    paretoList = new Array();
+    nonParetoList = new Array();
+}
+
+function parseOutputs(rawText) {
+    var lines = rawText.split('\n');
+    var numLines = lines.length;
+    var axisNum = 0;
+
+    for(var i=0; i<numLines; i++) {
+        var line = lines[i];
+
+        if(line[0] != 'G' && line != "" && line[1] != '-') {
+            axisNum ++;
+        }
+        else if(axisNum > 0) {
+            break;
+        }
+    }
+
+    var dataList = new Array();
+
+    var dataIndex = -1;
+    var axis = 0;
+
+    for(var i=0; i<numLines; i++) {
+        var line = lines[i];
+        var generation = 0;
+
+        if(line[0] == 'G' || line == '' || line[1] == '-') {
+            // not data
+            axis = 0;
+
+        }
+        else {
+            // data
+            if(axis == 0) {
+                dataIndex ++;
+                var dataPoint = new Array();
+                dataList[dataIndex] = dataPoint;
+            }
+            dataList[dataIndex][axis] = parseFloat(line);
+            axis ++;
+        }
+    }
+
+    return dataList;
+}
+
+function loadOutputs() {
+    initialize();
+
+    var rawTextParam = document.getElementById("textAreaParam").value;
+    var rawTextObj = document.getElementById("textAreaObj").value;
+
+    dataParam = parseOutputs(rawTextParam);
+    dataObj = parseOutputs(rawTextObj);
+
+    if(dataParam.length > 0 && dataObj.length > 0) {
+        paramNum = dataParam[0].length;
+        objNum = dataObj[0].length;
+
+        generateParamTable();
+    }
+    else {
+        document.getElementById('paramSettingPanel').style.display = 'none';
+        document.getElementById('paramSettingTable').innerHTML = '';
+    }
+    document.getElementById('outputPanel').style.display = 'none';
+}
+
+function generateParamTableText(paramNum) {
+    var innerText = '<tr><th style="width: 40px;"></th><th>Name</th><th>Min</th><th>Max</th></tr>';
+    for(var i=0; i<paramNum; i++) {
+        innerText += '<tr><th>#' + (i+1) + '</th>';
+        innerText += '<td><input type="text" id="param' + i + 'name" class="paramTextField"></td>';
+        innerText += '<td><input type="text" id="param' + i + 'min" class="paramTextField"></td>';
+        innerText += '<td><input type="text" id="param' + i + 'max" class="paramTextField"></td>';
+        innerText += '</tr>';
+    }
+    innerText += '<tr><td colspan="4" style="text-align: center;">';
+    innerText += '<button onclick="setParamRange()" style="width: 100%; height: 30px;">Generate .csv Files</button></td></tr>';
+    return innerText;
+}
+
+function generateParamTable() {
+    document.getElementById('paramSettingPanel').style.display = 'block';
+    document.getElementById('paramSettingTable').innerHTML = generateParamTableText(paramNum);
+
+    console.log('Param. num: ' + paramNum + ', Obj. num: ' + objNum);
+    for(var i=0; i<paramNum; i++) {
+        paramTemplate = {'name': 'Parameter '+i, 'min': 0, 'max': 0};
+        paramInfo[i] = paramTemplate;
+    }
+}
+
+function setParamRange() {
+    for(var i=0; i<paramNum; i++) {
+        var paramName = document.getElementById('param' + i + 'name').value;
+        var rawParamMin = document.getElementById('param' + i + 'min').value;
+        var rawParamMax = document.getElementById('param' + i + 'max').value;
+
+        var paramMin = parseFloat(rawParamMin);
+        var paramMax = parseFloat(rawParamMax);
+
+        if(isNaN(paramMin) || isNaN(paramMax)) {
+            console.log('error!');
+            alert('입력값이 잘못되었습니다.');
+            return;
+        }
+
+        if(paramMin > paramMax) {
+            temp = paramMin;
+            paramMin = paramMax;
+            paramMax = temp;
+            document.getElementById('param' + i + 'min').value = paramMin;
+            document.getElementById('param' + i + 'max').value = paramMax;
+        }
+
+        paramInfo[i].name = paramName;
+        paramInfo[i].min = paramMin;
+        paramInfo[i].max = paramMax;
+    }
+    parseData();
+}
+
+function remap(val, min, max) {
+    return (max - min) * val + min;
+}
+
+function parseData() {
+
+    paretoList = new Array();
+    nonParetoList = new Array();
+    
+    for(var i=0; i<Math.min(dataParam.length, dataObj.length); i++) {
+        dataPoint = new Object();
+        newParam = new Array();
+        for(var paramIndex=0; paramIndex<paramNum; paramIndex++) {
+            newParam[paramIndex] = remap(dataParam[i][paramIndex], paramInfo[paramIndex].min, paramInfo[paramIndex].max);
+        }
+        dataPoint.param = newParam;
+        dataPoint.obj = dataObj[i];
+        data[i] = dataPoint;
+    }
+    
+    var dataNum = data.length;
+    console.log('Data num: ' + dataNum);
+
+    for(var i=0; i<dataNum; i++) {
+        var dataPoint = data[i]
+        var isPareto = true;
+
+        for (var j=0; j<dataNum; j++) {
+            if(i == j) continue;
+            var isBetter = true;
+            for(var objIndex=0; objIndex<objNum; objIndex++) {
+                if(dataPoint.obj[objIndex] <= data[j].obj[objIndex]) isBetter = false;
+            }
+            if(isBetter) isPareto = false;
+        }
+
+        if(isPareto) paretoList.push(dataPoint);
+        else nonParetoList.push(dataPoint);
+    }
+    console.log('Pareto num: ' + paretoList.length + ', Non pareto num: ' + nonParetoList.length);
+    console.log(paretoList);
+    document.getElementById('outputPanel').style.display = 'block';
+}
+
+function exportData(type) {
+    if(type == 0) createCSV(paretoList, 'data_pareto');
+    else createCSV(nonParetoList, 'data_nonpareto');
+}
+
+function createCSV(list, name) {
+    let csvContent = "data:text/csv;charset=utf-8,";
+
+    for(var i=0; i<paramNum; i++) {
+        csvContent += paramInfo[i].name + ',';
+    }
+
+    for(var i=0; i<objNum; i++) {
+        if(i != 0) csvContent += ',';
+        csvContent += 'Objective ' + (i+1);
+    }
+
+    csvContent += '\r\n';
+
+    for(var i=0; i<list.length; i++) {
+        csvContent += list[i].param.join(',') + ',' + list[i].obj.join(',') + '\r\n';
+    }
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", name + ".csv");
+    document.body.appendChild(link);
+    link.click();
+}
+
+</script>
+
+<style>
+    h3 {
+        padding-left: 15px;
+        margin-block-end: 0.5em;
+    }
+
+    table {
+        border: 2px solid black;
+        width: 100%;
+        border-radius: 25px;
+        box-sizing: border-box;
+    }
+
+    table, th, td {
+        padding: 5px;
+    }
+
+    textarea {
+        resize: none;
+        width: 100%;
+        padding: 8px;
+    }
+
+    input {
+        width: 100%;
+        height: 25px;
+    }
+
+    textarea, input {
+        box-sizing: border-box;
+        border: 1.5px solid black;
+        border-radius: 8px;
+    }
+
+    button {
+        border: 0;
+        color: white;
+        background-color: black;
+        font-weight: bold;
+        border-radius: 50vh;
+    }
+
+    .paramTextField{
+        text-align: center;
+    }
+</style>
+
+</head>
+
+<body onload="screenManager();" style="margin: 0px;">
+    <div id="mainPanel" style="position: absolute; margin: 0px;">
+        <h2>Octopus Log to CSV</h2>
+        <h3>Log Text</h3>
+        <table>
+            <tr>
+                <th>Parameters</th>
+                <th>Objectives</th>
+            </tr>
+            <tr>
+                <td>
+                    <textarea id="textAreaParam" class="outputTextArea" rows="10"></textarea>
+                </td>
+                <td>
+                    <textarea id="textAreaObj" class="outputTextArea" rows="10"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <button onclick="loadOutputs()" style="width: 100%; height: 30px;">
+                        Load Output
+                    </button>
+                </td>
+            </tr>
+        </table>
+        
+        <div id="paramSettingPanel" style="display: none;">
+            <h3>Parameters</h3>
+            <table id="paramSettingTable"></table>
+        </div>
+
+        <div id="outputPanel" style="display: none;">
+            <h3>Output .csv Files</h3>
+            <table>
+                <tr>
+                    <th style="width: 120px;">Pareto</th>
+                    <td>
+                        <button onclick="exportData(0)" style="width: 100%; height: 30px;">
+                            Download
+                        </button>
+                    </td>
+                    <td style="width: 1px;">
+                        <div style="width: 1px; height: 30px; background-color: black; padding: 0px;"></div>
+                    </td>
+                    <th style="width: 120px;">Non Pareto</th>
+                    <td>
+                        <button onclick="exportData(1)" style="width: 100%; height: 30px;">
+                            Download
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
