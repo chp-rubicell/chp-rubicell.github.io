@@ -233,13 +233,13 @@ CanvasContainer.onwheel = function (event) {
     }
 }
 document.getElementById('PageWrapper').onwheel = function (event) {
-    event = event || window.event;
+    event = event || window.event;  //! deprecated?
     if (event.target.id == 'CanvasRenderer'  && clickable) {
         return false;
     }
 }
 document.getElementById('PageWrapper').onmousedown = function (event) {
-    event = event || window.event;
+    event = event || window.event;  //! deprecated?
     if (event.button == 1 && event.target.id == 'CanvasRenderer') {
         return false;
     }
@@ -301,6 +301,9 @@ function objectHighlight(event) {
         switch (objType) {
             case 'surface':
                 objProp = surfList[objName];
+                if (objProp.OutsideBCObj!==undefined && objProp.OutsideBCObj!='') {
+                    displayText += ` (${objProp.OutsideBCObj.toLowerCase()})`;
+                }
                 displayText += `<br><b>[Type]</b> ${objType} (${objProp.SurfaceType})`;
                 displayText += '<br><b>[Construction]</b> ' + objProp.Construction;
                 displayText += '<br><b>[Zone]</b> ' + objProp.ZoneName;
@@ -308,6 +311,9 @@ function objectHighlight(event) {
                 break;
             case 'fenestration':
                 objProp = fenList[objName];
+                if (objProp.OutsideBCObj!==undefined && objProp.OutsideBCObj!='') {
+                    displayText += ` (${objProp.OutsideBCObj.toLowerCase()})`;
+                }
                 displayText += `<br><b>[Type]</b> ${objType} (${objProp.SurfaceType})`;
                 displayText += '<br><b>[Construction]</b> ' + objProp.Construction;
                 displayText += '<br><b>[Zone]</b> ' + surfList[objProp.SurfaceName].ZoneName;
@@ -855,6 +861,7 @@ function parseIDF(code) {
                     'SurfaceType'  : objSplit[iddInfo.indexOf('surface type')].toLowerCase(),
                     'Construction' : objSplit[iddInfo.indexOf('construction name')],
                     'SurfaceName'  : surfName,
+                    'OutsideBCObj' : objSplit[iddInfo.indexOf('outside boundary condition object')],
                     'VerticeNumber': vertNum,
                     'Vertices'     : surfVertices,
                 }
@@ -1294,7 +1301,9 @@ const matDefault = {
     'Adiabatic': new THREE.MeshPhongMaterial({color: '#f24b91', side: THREE.DoubleSide, opacity: 0.8}),
     'Roof': new THREE.MeshPhongMaterial({color: '#a82525', side: THREE.DoubleSide, opacity: 0.5}),
     'OuterWall': new THREE.MeshLambertMaterial({color: '#ffe16b', side: THREE.DoubleSide}),
+    // 'OuterWall': new THREE.MeshLambertMaterial({color: '#ffe16b'}),
     'InnerSurf': new THREE.MeshPhongMaterial({color: '#444444', side: THREE.DoubleSide, opacity: 0.5}),
+    // 'InnerSurf': new THREE.MeshPhongMaterial({color: '#444444', opacity: 0.5}),
     'Window': new THREE.MeshPhongMaterial({color: '#00eaff', side: THREE.DoubleSide, opacity: 0.3}),
     'Door': new THREE.MeshPhongMaterial({color: '#1747d4', side: THREE.DoubleSide, opacity: 0.5}),
     'Shading': new THREE.MeshPhongMaterial({color: '#624285', side: THREE.DoubleSide, opacity: 0.7}),
@@ -1304,9 +1313,9 @@ const matDefault = {
 for (var mat in matDefault) {
     if (matDefault[mat].opacity < 1) {
         matDefault[mat].transparent = true;
+        //* matDefault[mat].depthWrite = false;
     }
 }
-
 
 
 function renderModel() {
@@ -1327,7 +1336,12 @@ function renderModel() {
     }
 
     // Surface 렌더링
+    var surfToSkip = [];
     for (const [surfName, surfProp] of Object.entries(surfList)) {
+
+        if (surfToSkip.includes(surfName)) {
+            continue;
+        }
 
         zoneName = surfProp.ZoneName;
         // if (!zoneList[zoneName].Visible) continue;
@@ -1375,6 +1389,9 @@ function renderModel() {
         matSurf = matSurf.clone();
 
         if (zoneList[zoneName].Visible) {
+            if (surfProp.OutsideBCObj != '') {
+                surfToSkip.push(surfProp.OutsideBCObj.toLowerCase());
+            }
             if (!transparencyOn) {
                 if (matSurf.opacity < 1) {
                     // matSurf.color = add_black_color_rgb(matSurf.color, matSurf.opacity);
@@ -1385,8 +1402,15 @@ function renderModel() {
                     matSurf.opacity = 1;
                 }
                 matSurf.transparent = false;
+                //* matSurf.depthWrite = true;
             }
             const surfMesh = new THREE.Mesh(surfGeom, matSurf);
+            /*
+            # TEST FOR SURFACE VECTOR
+            console.log('test');
+            normVec = new THREE.Vector3(...surfGeom.attributes.normal.array.slice(0, 3));
+            surfMesh.translateOnAxis(normVec, 0.1);
+            */
             surfMesh.renderOrder = 0;
             surfMesh.layers.enable(1);  // for mouse selection
             surfMesh.sourceObjName = surfName;
@@ -1424,9 +1448,19 @@ function renderModel() {
     }
 
     // Fenestration 렌더링 
+    var fenToSkip = [];
     for (const [fenName, fenProp] of Object.entries(fenList)) {
+
+        if (fenToSkip.includes(fenName)) {
+            continue;
+        }
+
         zoneName = surfList[fenProp.SurfaceName].ZoneName;
         if (!zoneList[zoneName].Visible) continue;
+
+        if (fenProp.OutsideBCObj != '') {
+            fenToSkip.push(fenProp.OutsideBCObj.toLowerCase());
+        }
 
         fenGeom = fenProp.Geometries;
 
@@ -1449,6 +1483,7 @@ function renderModel() {
                 matFen.opacity = 1;
             }
             matFen.transparent = false;
+            //* matFen.depthWrite = true;
         }
         const fenMesh = new THREE.Mesh(fenGeom, matFen);
         fenMesh.layers.enable(1);  // for mouse selection
@@ -1484,6 +1519,7 @@ function renderModel() {
                     matShade.opacity = 1;
                 }
                 matShade.transparent = false;
+                //* matShade.depthWrite = true;
             }
             const shadeMesh = new THREE.Mesh(shadeGeom, matShade);
             shadeMesh.layers.enable(1);  // for mouse selection

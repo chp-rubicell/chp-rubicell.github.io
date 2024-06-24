@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name='title' property='og:title' content='EP Shape Previewer Updatelog'/>
+    <meta name='author' content='Chul-Hong Park'>
+    <meta name='description' property='og:description' content='Shape previewer for EnergyPlus models'/>
+    <meta property='og:url' content='https://chp-rubicell.github.io/epshape/'/>
+    <meta name='image' property='og:image' content='https://chp-rubicell.github.io/epshape/resources/thumbnail.jpg'/>
+    <meta name='twitter:image' content='https://chp-rubicell.github.io/epshape/resources/thumbnail.jpg' />
+    <meta property='og:image:width' content='1200' />
+    <meta property='og:image:height' content='627' />
+    <meta property='og:type' content='website' />
+    <link rel="icon" href="https://chp-rubicell.github.io/epshape/resources/favicon.png">
+    <title>EP Shape Previewer Updatelog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        html, body {
+            position: absolute;
+            margin: 0px;
+            width: 100%;
+            height: 100%;
+            font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+        }
+        html {
+            background: url('bg.jpg');;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            overflow-y: auto;
+        }
+        body {
+            padding: 0 min(30px, 5%);
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            display: flex;
+            align-items: safe center; /* vertical */
+            justify-content: center; /* horizontal */
+            overflow-y: auto;
+        }
+        .PageGroup {
+            display: inline-block;
+            /* width: 100%; */
+            height: fit-content;
+            padding: 30px min(30px, 5%);
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            color: white;
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- <div class="bg"></div> -->
+
+    <div class="PageGroup">
+        <h2>2024-06-24</h2>
+        <ul>
+            <li>Skipped rendering duplicate surfaces.</li>
+        </ul>
+        <h2>2024-03-11</h2>
+        <ul>
+            <li>Added 's' hotkey for exporting image.</li>
+        </ul>
+        <!-- <h2>2024-03-12</h2>
+        <ul>
+            <li>Changed the way transparent objects are rendered.</li>
+        </ul> -->
+    </div>
+
+</body>
+</html>
