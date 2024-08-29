@@ -374,6 +374,7 @@ function addWallSegment({floor, coords, name='', snappable=true, texture='#fff'}
         name = `wall_${floorTag}_${count}`;
         objectCount[floorTag] = count + 1;
     }
+    // coords = coords.map(v => roundValueVector(v));  //! 이건 확인 필요
     //? object별 floor 정보 저장
     objectNameToFloorMap[name] = floor;
     //? 2D object에 추가

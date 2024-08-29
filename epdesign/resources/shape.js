@@ -168,14 +168,14 @@ class Vector extends Array {
 function pointOnLine(point, linePt1, linePt2) {
     const p = point.sub(linePt1);
     const l = linePt2.sub(linePt1);
-    if (l.x == 0) {
-        if (p.x == 0) return true;
+    if (isSimilar(l.x, 0)) {
+        if (isSimilar(p.x, 0)) return true;
     }
-    else if (l.y == 0) {
-        if (p.y == 0) return true;
+    else if (isSimilar(l.y, 0)) {
+        if (isSimilar(p.y, 0)) return true;
     }
     else {
-        if (p.x / l.x == p.y / l.y) return true;
+        if (isSimilar(p.x / l.x, p.y / l.y)) return true;
     }
     return false;
 }

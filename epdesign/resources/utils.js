@@ -67,7 +67,9 @@ const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 // const cumulativeSum = (sum = 0, n => sum += n);
 // example: [5, 10, 3, 2].map(cumulativeSum);
 
-const THRESHOLD = 10e-5;
+const THRESHOLD = 10e-6;
+const isNearZero = (val) => Math.abs(val) < THRESHOLD;
+const isSimilar = (val1, val2) => Math.abs(val2 - val1) < THRESHOLD;
 
 function computeGridSize(range, int) {
     let unit = Math.pow(10, Math.floor(Math.log10(range / 10)));
@@ -98,11 +100,12 @@ function computeGridTicks(min, max) {
     return ticks;
 }
 
-//+ ------------------------------------------------------------------- +//
-//MARK: Round value [m]
-
 function roundValue(value) {
+    // [m]
     return Number(value.toFixed(3));
+}
+function roundValueVector(v) {
+    return new Vector(roundValue(v.x), roundValue(v.y));
 }
 
 //+ ------------------------------------------------------------------- +//
