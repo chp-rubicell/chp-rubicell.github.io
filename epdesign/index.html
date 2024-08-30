@@ -25,9 +25,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&family=Roboto:ital,wght@0,100;0,400;0,700&family=Roboto+Condensed:ital,wght@0,100;0,400;0,700&display=swap" rel="stylesheet">
 
-    <script src="resources/three.js"></script>
-    <script src="resources/CSS2DRenderer.js"></script>
-    <script src="resources/earcut.js"></script>
+    <script src="resources/libraries/three.js"></script>
+    <script src="resources/libraries/CSS2DRenderer.js"></script>
+    <script src="resources/libraries/earcut.js"></script>
 
     <script>
         const widthThreshold = 800;
@@ -64,7 +64,7 @@
             <div class="canvasWrapper">
                 <canvas></canvas>
                 <div id="editorInput">
-                    <input id="editorInputField" type="text" oninput="checkInputValidity();" placeholder="" />
+                    <input id="editorInputField" type="text" tabindex="-1" oninput="checkInputValidity();" placeholder="" />
                 </div>
             </div>
             <div class="toolbar borderbottom" style="position: absolute; width: 100%; padding: 5px 10px; max-width: 100%; height: fit-content;">
@@ -132,13 +132,14 @@
     </div>
 
     <!--* Scripts *-->
-    <script src="resources/shape.js?v=24_0830A"></script>
-    <script src="resources/utils.js?v=24_0830A"></script>
+    <script src="resources/libraries/shape.js?v=24_0830A"></script>
+    <script src="resources/compiled-scripts.js?v=24_0830A"></script>
+    <!-- <script src="resources/utils.js?v=24_0830A"></script>
     <script src="resources/objects.js?v=24_0830A"></script>
     <script src="resources/divider.js?v=24_0830"></script>
     <script src="resources/editor.js?v=24_0830"></script>
     <script src="resources/viewer.js?v=24_0830"></script>
-    <script src="resources/main.js?v=24_0830"></script>
+    <script src="resources/main.js?v=24_0830"></script> -->
 
 </body>
 
