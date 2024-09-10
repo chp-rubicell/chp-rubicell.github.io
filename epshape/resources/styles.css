@@ -472,6 +472,46 @@ button.settingsPanel:active, .customButton:focus {
     color: rgba(240,245,247,0.7);
 }
 
+.settingsInput {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 1em;
+    text-align: center;
+    border: 0px;
+    outline: 2px solid #112C4460;
+    background: none;
+    color: #112C44e0;
+    padding: 1px 10px 1px;
+    border-radius: 30px;
+    margin-left: 2.5px;
+    margin-right: 2.5px;
+}
+.settingsInput:enabled:not(:focus):hover {
+    background-color: #112C4420;
+}
+.settingsInput:enabled:focus {
+    outline: 2px solid #112C4460;
+    background-color: #112C4460;
+    color: rgba(240,245,247,0.7);
+}
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.settingsPanelBlock input[type=checkbox] {
+    margin: 3px;
+    width: 13px;
+    height: 13px;
+}
+
 .fadeout {
     transition: visibility 0s linear 0.3s, opacity 0.3s;
     visibility: hidden;
