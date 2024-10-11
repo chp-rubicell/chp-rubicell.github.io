@@ -22,9 +22,19 @@ html, body {
     height: 100%;
     overflow: hidden;
     font-family: 'Roboto', sans-serif;
+    font-variant-ligatures: none;
     color: white;
     cursor: default;
     user-select: none;
+}
+html {
+    background: #292A2F url('./bg.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
 }
 
 canvas {
@@ -222,8 +232,7 @@ span {
 
 
 
-
-.settingsPanel {
+.glass {
     font-family: 'Roboto', sans-serif;
     background-color: rgba(240,245,247,0.5);
     border: none;
@@ -241,15 +250,39 @@ span {
     padding-bottom: 0px;
     transition: box-shadow 0.5s, background-color 0.5s;;
 }
-button.settingsPanel:hover {
+button.glass:hover {
     background-color: rgba(240,245,247,0.8);
     /* box-shadow: 0 10px 20px 0px rgba(0,0,0,0.3); */
     box-shadow: 0 0 5px 2px rgba(240,245,247,0.3);
 }
-button.settingsPanel:active, .customButton:focus {
+button.glass:active, .customButton:focus {
     background-color: rgba(158,227,255,0.8);
     /* transition-duration: 0s; */
     box-shadow: 0 0 5px 2px rgba(158,227,255,0.3);
+}
+
+.defaultPanel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    /* height: calc(100% - 50px); */
+    /* height: fit-content; */
+    max-height: -moz-calc(100% - 50px);
+    max-height: -webkit-calc(100% - 50px);
+    max-height: calc(100% - 50px);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    /* margin: auto auto auto auto; */
+    /* padding: 20px; */
+    padding: 60px 0px 20px;
+    visibility: hidden;
+    opacity: 0;
+    background-color: rgba(240,245,247,0.7);
+    line-height: 1.5;
 }
 
 /* #SettingsContainer {
@@ -260,13 +293,11 @@ button.settingsPanel:active, .customButton:focus {
     left: 100%;
     background-color: aquamarine;
 } */
-#HoverBtnWrapper {
+.hoverBtnWrapper {
     position: absolute;
     text-align: center;
     top: 0px;
-    right: 0px;
     margin: 10px;
-    width: 100px;
     height: 30px;
 }
 .hoverBtn {
@@ -296,6 +327,17 @@ button.settingsPanel:active, .customButton:focus {
     background-position: center center;
     background-repeat: no-repeat;
 }
+#HelpBtn {
+    top: 0px;
+    right: 0px;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    background-image: url('help.png?v=23_0607A');
+    background-size: 22px 22px;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
 .settingsCloseBtn {
     position: absolute;
     top: 0px;
@@ -309,28 +351,6 @@ button.settingsPanel:active, .customButton:focus {
 .settingsCloseBtn:hover {
     opacity: 0.5;
 }
-#SettingsPanel {
-    position: absolute;
-    display: block;
-    width: 350px;
-    height: -moz-calc(100% - 50px);
-    height: -webkit-calc(100% - 50px);
-    height: calc(100% - 50px);
-    top: 25px;
-    left: 50%;
-    margin-left: -175px;
-    /* margin-top: -150px; */
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    /* margin: auto auto auto auto; */
-    /* padding: 20px; */
-    padding: 60px 0px 20px;
-    visibility: hidden;
-    opacity: 0;
-    background-color: rgba(240,245,247,0.7);
-    line-height: 1.5;
-}
 #SettingsPanel::before {
     content: "Settings";
     position: absolute;
@@ -341,8 +361,10 @@ button.settingsPanel:active, .customButton:focus {
 }
 .panelContent {
     position: relative;
+    flex: 1;
     width: 100%;
     height: 100%;
+    /* max-height: calc(100% - 80px); */
     overflow-y: auto;
     text-align: left;
     padding: 0px 4px 0px 20px;
@@ -401,6 +423,9 @@ button.settingsPanel:active, .customButton:focus {
     overflow: hidden;
     font-size: 1em;
 }
+.settingsPanelBlock:last-child {
+    margin-bottom: 0;
+}
 .settingsPanelBlock label {
     width: 100%;
     display: block;
@@ -442,11 +467,13 @@ button.settingsPanel:active, .customButton:focus {
     list-style: disc outside none; 
     padding-left: 2em;
     padding-inline-start: 20px;
+    margin-block-end: 0;
 }
 .settingsPanelBlock li {
     text-indent: -1em;
     padding-left: 1.5em;
-    padding-bottom: 0.5ex;
+    padding-bottom: 1ex;
+    line-height: 1.1;
 }
 
 .settingsPanelButton {
@@ -472,7 +499,15 @@ button.settingsPanel:active, .customButton:focus {
     color: rgba(240,245,247,0.7);
 }
 
+.settingsFlexSpan {
+    width:100%;
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+}
+
 .settingsInput {
+    height: 18px;
     font-family: 'Roboto', sans-serif;
     font-weight: bold;
     font-size: 1em;
@@ -481,10 +516,17 @@ button.settingsPanel:active, .customButton:focus {
     outline: 2px solid #112C4460;
     background: none;
     color: #112C44e0;
-    padding: 1px 10px 1px;
+    padding: 0 10px 0;
     border-radius: 30px;
-    margin-left: 2.5px;
+    /* margin-left: 2.5px; */
     margin-right: 2.5px;
+    width: 60px;
+    margin-left: auto;
+    min-width: 25px;
+    flex: none;
+}
+.settingsInput:disabled {
+    outline: 2px dashed #112C4460;
 }
 .settingsInput:enabled:not(:focus):hover {
     background-color: #112C4420;
@@ -565,30 +607,17 @@ input[type=number] {
     background-color: #112C4440;
 }
 
-#CommandPanel {
-    position: absolute;
-    display: block;
-    width: 500px;
-    height: -moz-calc(100% - 50px);
-    height: -webkit-calc(100% - 50px);
-    height: calc(100% - 50px);
-    top: 25px;
-    left: 50%;
-    margin-left: -250px;
-    /* margin-top: -150px; */
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    /* margin: auto auto auto auto; */
-    /* padding: 20px; */
-    padding: 60px 0px 20px;
-    visibility: hidden;
-    opacity: 0;
-    background-color: rgba(240,245,247,0.7);
-    line-height: 1.5;
-}
 #CommandPanel::before {
     content: "Commands";
+    position: absolute;
+    top: 12px;
+    left: 20px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#HelpPanel::before {
+    content: "Help";
     position: absolute;
     top: 12px;
     left: 20px;

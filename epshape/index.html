@@ -3,6 +3,12 @@
 
 <head>
     <meta charset="utf-8" />
+
+    <meta name="theme-color" content="#292A2F" />
+    <!-- Sets the status bar style to transparent -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
     <meta name='title' property='og:title' content='EP Shape Previewer'/>
     <meta name='author' content='Chul-Hong Park'>
     <meta name='description' property='og:description' content='Shape previewer for EnergyPlus models'/>
@@ -17,16 +23,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_0910" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1012" />
     <script src="resources/three.js"></script>
     <script src="resources/CSS2DRenderer.js"></script>
+    <script src="resources/LineMaterial.js"></script>
+    <script src="resources/LineSegmentsGeometry.js"></script>
+    <script src="resources/LineGeometry.js"></script>
+    <script src="resources/LineSegments2.js"></script>
+    <script src="resources/Line2.js"></script>
     <script src="resources/earcut.js"></script>
     <script src="resources/iddLibrary.js?v=23_0728"></script>
 </head>
 
 <body>
 
-    <div class="bg" style="background-image: url('resources/bg.jpg');"></div>
+    <!-- <div class="bg" style="background-image: url('resources/bg.jpg');"></div> -->
 
     <div id="fileHoverMask" class="bg" style="z-index: 21; display: none;"></div>
 
@@ -53,12 +64,15 @@
                 <div id="fileHover" class="bg" style="background: radial-gradient(#000000a0, #00000000); z-index: 20; display: none;"><p id="fileHoverText">drop to load file</p></div>
                 
 
-                <div id="HoverBtnWrapper">
-                    <button id="SaveBtn" class="hoverBtn settingsPanel" onclick="exportImage();"></button>
-                    <button id="SettingsBtn" class="hoverBtn settingsPanel" onclick="settingsPanelVisibility(1);"></button>
+                <div class="hoverBtnWrapper" style="right: 0px;">
+                    <button id="HelpBtn" class="hoverBtn glass" onclick="panelVisibility(helpPanel, 1); hoverBtnVisibility(-1);"></button>
+                </div>
+                <div class="hoverBtnWrapper" style="right: 40px;">
+                    <button id="SaveBtn" class="hoverBtn glass" onclick="exportImage();"></button>
+                    <button id="SettingsBtn" class="hoverBtn glass" onclick="settingsPanelVisibility(1);"></button>
                 </div>
 
-                <div id="SettingsPanel" class="settingsPanel">
+                <div id="SettingsPanel" class="glass defaultPanel" style="width: 350px;">
                     <div class="settingsCloseBtn" onclick="settingsPanelVisibility(0);"></div>
 
                     <div id="SettingsPanelContent" class="panelContent">
@@ -78,14 +92,44 @@
                     </div>
                 </div>
 
-                <div id="CommandPanel" class="settingsPanel">
-                    <div class="settingsCloseBtn" onclick="commandPanelVisibility(-1);"></div>
+                <div id="HelpPanel" class="glass defaultPanel" style="width: 500px;">
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1); hoverBtnVisibility(1);"></div>
 
-                    <div id="CommandPanelContent" class="panelContent">
+                    <div class="panelContent">
+                        <div class="settingsPanelBlock">
+                            <h5>Loading files</h5>
+                            <ul>
+                                <li><b>(file drop) : </b>Load .idf file.</li>
+                                <li><b>shift + (file drop) : </b>Load .idf file with current settings.</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Mouse</h5>
+                            <ul>
+                                <li><b>shift + left mouse : </b>Snap camera angle.</li>
+                                <li><b>midde mouse : </b>Pan camera.</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Keyboard</h5>
+                            <ul>
+                                <li><b>r : </b>Reset camera view.</li>
+                                <li><b>s : </b>Export viewport as image.</li>
+                                <li><b>/ : </b>Start command input.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="CommandPanel" class="glass defaultPanel" style="width: 500px;">
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1);"></div>
+
+                    <div class="panelContent">
                         <div class="settingsPanelBlock">
                             <h5>Basics</h5>
                             <ul>
                                 <li><b>help : </b>See the list of commands.</li>
+                                <li><b>↑ : </b>Insert last command.</li>
                             </ul>
                         </div>
                         <div class="settingsPanelBlock">
@@ -95,7 +139,7 @@
                                 <li><b>maxzoom + (num) : </b>Set max camera zoom distance to (num).</li>
                             </ul>
                         </div>
-                        <div class="settingsPanelBlock" style="margin-bottom:0;">
+                        <div class="settingsPanelBlock">
                             <h5>Shadows</h5>
                             <ul>
                                 <li><b>shadowalt + (num) : </b>Set shadow altitude to (num)°.</li>
@@ -109,7 +153,7 @@
                     </div>
                 </div>
 
-                <div id="CommandListener" class="settingsPanel"></div>
+                <div id="CommandListener" class="glass"></div>
 
             </div>
 
@@ -118,7 +162,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-09-10</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-10-12</a></b>
                 </small></p>
             </div>
 
@@ -130,9 +174,9 @@
         const pad = 40;
         const minWidth = 550;
         const maxWidth = 1200;
-        const panelWidth = 800;
-        const panelHeight = 500;
-        var canvMult = 2;
+        const panelWidth = 1280;
+        const panelHeight = 800;
+        var canvMult = 1;
         if (window.location.hash) {
             hashStr = window.location.hash.replace('#', '').toLowerCase();
             hashVal = parseFloat(hashStr);
@@ -184,19 +228,54 @@
         }
         screenManager();
     </script>
-    <!-- <script src="resources/scripts.js?v=24_0910"></script> -->
-    <script src="resources/scripts-compiled.js?v=24_0910"></script>
+    <!-- <script src="resources/scripts.js?v=24_1012"></script> -->
+    <script src="resources/scripts-compiled.js?v=24_1012"></script>
     <script>
-        const hoverBtn = document.getElementById('HoverBtnWrapper');
-        hoverBtnMargin = Number(getComputedStyle(hoverBtn).margin.slice(0, -2));
+        const hoverBtns = document.getElementsByClassName('hoverBtnWrapper');
+        const hoverBtnMargin = Number(getComputedStyle(hoverBtns[0]).margin.slice(0, -2));
 
         const settingsPanel = document.getElementById('SettingsPanel');
-
+        
         settingsPanelVisibility(-1);
-        hoverBtn.classList.remove('fadeoutSlide');
+        for (const hoverBtn of hoverBtns) {
+            hoverBtn.classList.remove('fadeoutSlide');
+        }
+        hoverBtns[0].style.top = '0px';
+        hoverBtns[0].classList.add('fadeinSlide');
+        
+        function hoverBtnVisibility(toggle) {
+            if (toggle <= 0) {
+                // 닫기
+                for (const hoverBtn of hoverBtns) {
+                    hoverBtn.style.top = - hoverBtn.clientHeight - hoverBtnMargin*2 + 'px';
+                    hoverBtn.classList.remove('fadeinSlide');
+                    hoverBtn.classList.add('fadeoutSlide');
+                }
+            }
+            else {
+                // 열기
+                let hoverBtnsToChange = [];
+                if ((idfName||'') == '') {
+                    // 파일이 열리기 전
+                    hoverBtnsToChange = [hoverBtns[0]];
+                }
+                else {
+                    hoverBtnsToChange = [...hoverBtns];
+                }
+
+                for (const hoverBtn of hoverBtnsToChange) {
+                    hoverBtn.style.top = '0px';
+                    hoverBtn.classList.remove('fadeoutSlide');
+                    hoverBtn.classList.add('fadeinSlide');
+                }
+            }
+        }
         
         function settingsPanelVisibility(toggle=null) {
-            hoverBtn.blur();
+            
+            for (const hoverBtn of hoverBtns) {
+                hoverBtn.blur();
+            }
 
             if (toggle==undefined || toggle==null) {
                 if (clickable) toggle = 1;
@@ -207,10 +286,7 @@
                 case -1:
                     // 모두 닫으려고 할 때
                     clickable = false;
-                    
-                    hoverBtn.style.top = - hoverBtn.clientHeight - hoverBtnMargin*2 + 'px';
-                    hoverBtn.classList.remove('fadeinSlide');
-                    hoverBtn.classList.add('fadeoutSlide');
+                    hoverBtnVisibility(-1);
 
                     settingsPanel.style.visibility = 'hidden';
                     settingsPanel.style.opacity = 0;
@@ -222,10 +298,7 @@
                 case 0:
                     // 창이 열려있을 때
                     clickable = true;
-
-                    hoverBtn.style.top = '0px';
-                    hoverBtn.classList.remove('fadeoutSlide');
-                    hoverBtn.classList.add('fadeinSlide');
+                    hoverBtnVisibility(1);
 
                     settingsPanel.style.visibility = 'hidden';
                     settingsPanel.style.opacity = 0;
@@ -237,10 +310,7 @@
                 case 1:
                     // 창이 닫혀있을 때
                     clickable = false;
-                    
-                    hoverBtn.style.top = -hoverBtn.clientHeight - hoverBtnMargin*2 + 'px';
-                    hoverBtn.classList.remove('fadeinSlide');
-                    hoverBtn.classList.add('fadeoutSlide');
+                    hoverBtnVisibility(-1);
 
                     settingsPanel.style.visibility = 'visible';
                     settingsPanel.style.opacity = 1;
@@ -255,25 +325,27 @@
         }
 
         const commandPanel = document.getElementById('CommandPanel');
+        const helpPanel = document.getElementById('HelpPanel');
 
-        commandPanelVisibility(-1);
+        panelVisibility(commandPanel, -1);
+        panelVisibility(helpPanel, -1);
         
-        function commandPanelVisibility(toggle=0) {
+        function panelVisibility(panel, toggle=0) {
             if (toggle <= 0) {
                 // 창 닫으려고 할 때
                 clickable = true;
-                commandPanel.style.visibility = 'hidden';
-                commandPanel.style.opacity = 0;
-                commandPanel.classList.remove('fadein');
-                commandPanel.classList.add('fadeout');
+                panel.style.visibility = 'hidden';
+                panel.style.opacity = 0;
+                panel.classList.remove('fadein');
+                panel.classList.add('fadeout');
             }
             else {
                 // 창 열려고 할 때
                 clickable = false;
-                commandPanel.style.visibility = 'visible';
-                commandPanel.style.opacity = 1;
-                commandPanel.classList.remove('fadeout');
-                commandPanel.classList.add('fadein');
+                panel.style.visibility = 'visible';
+                panel.style.opacity = 1;
+                panel.classList.remove('fadeout');
+                panel.classList.add('fadein');
             }
         }
     </script>
