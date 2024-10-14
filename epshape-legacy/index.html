@@ -6,48 +6,33 @@
 
     <meta name="theme-color" content="#292A2F" />
     <!-- Sets the status bar style to transparent -->
-    <!-- <meta name="apple-mobile-web-app-capable" content="yes" /> -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="mobile-web-app-capable" content="yes" />
     
     <meta name='title' property='og:title' content='EP Shape Previewer'/>
     <meta name='author' content='Chul-Hong Park'>
     <meta name='description' property='og:description' content='Shape previewer for EnergyPlus models'/>
     <meta property='og:url' content='https://chp-rubicell.github.io/epshape/'/>
-    <meta name='image' property='og:image' content='https://chp-rubicell.github.io/epshape/resources/imgs/thumbnail.jpg'/>
-    <meta name='twitter:image' content='https://chp-rubicell.github.io/epshape/resources/imgs/thumbnail.jpg' />
+    <meta name='image' property='og:image' content='https://chp-rubicell.github.io/epshape/resources/thumbnail.jpg'/>
+    <meta name='twitter:image' content='https://chp-rubicell.github.io/epshape/resources/thumbnail.jpg' />
     <meta property='og:image:width' content='1200' />
     <meta property='og:image:height' content='627' />
     <meta property='og:type' content='website' />
-    <link rel="icon" href="https://chp-rubicell.github.io/epshape/resources/imgs/favicon.png">
+    <link rel="icon" href="https://chp-rubicell.github.io/epshape/resources/favicon.png">
     <title>EP Shape Previewer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1015" />
-    <script src="./resources/earcut.js"></script>
-    <script src="./resources/iddLibrary.js"></script>
-
-    <!-- <script type="importmap">
-        {
-            "imports": {
-                "three": "./resources/three/three.module.min.js",
-                "three/addons/": "./resources/three/addons/"
-                "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
-            }
-        }
-    </script> -->
-    <script type="module">
-
-        // import * as THREE from 'three';
-        // import * as THREE from './resources/three/three.module.min.js';
-        // import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
-
-        // console.log(new THREE.Vector3(0, 0, 0))
-
-        // import { CSS2DRenderer, CSS2DObject } from 'three/addons/CSS2DRenderer.js';
-    </script>
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1012" />
+    <script src="resources/three.js"></script>
+    <script src="resources/CSS2DRenderer.js"></script>
+    <script src="resources/LineMaterial.js"></script>
+    <script src="resources/LineSegmentsGeometry.js"></script>
+    <script src="resources/LineGeometry.js"></script>
+    <script src="resources/LineSegments2.js"></script>
+    <script src="resources/Line2.js"></script>
+    <script src="resources/earcut.js"></script>
+    <script src="resources/iddLibrary.js?v=23_0728"></script>
 </head>
 
 <body>
@@ -62,7 +47,7 @@
         <div id="MainPanel">
 
             <h2>
-                <img height="40px" src="resources/imgs/eplogo.png" style="vertical-align: middle;"/>
+                <img height="40px" src="resources/eplogo.png" style="vertical-align: middle;"/>
                 EnergyPlus Shape Previewer
             </h2>
             <div style="width: 100%; height: auto; text-align: right; display: block; margin-top: 10px; margin-bottom: 15px;">
@@ -121,10 +106,8 @@
                         <div class="settingsPanelBlock">
                             <h5>Mouse</h5>
                             <ul>
-                                <li><b>left mouse : </b>Rotate camera.</li>
                                 <li><b>shift + left mouse : </b>Snap camera angle.</li>
-                                <li><b>right mouse : </b>Pan camera.</li>
-                                <li><b>middle mouse : </b>Pan camera.</li>
+                                <li><b>midde mouse : </b>Pan camera.</li>
                             </ul>
                         </div>
                         <div class="settingsPanelBlock">
@@ -179,7 +162,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-10-11</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-10-12</a></b>
                 </small></p>
             </div>
 
@@ -193,7 +176,7 @@
         const maxWidth = 1200;
         const panelWidth = 1280;
         const panelHeight = 800;
-        let canvMult = 1;
+        var canvMult = 1;
         if (window.location.hash) {
             hashStr = window.location.hash.replace('#', '').toLowerCase();
             hashVal = parseFloat(hashStr);
@@ -213,14 +196,14 @@
         CanvasContainer.style.width = panelWidth+"px";
         CanvasContainer.style.height = panelHeight+"px";
         
-        let mainPanelWidth = 0;
-        let mainPanelHeight = 0;
+        var mainPanelWidth = 0;
+        var mainPanelHeight = 0;
 
         window.onresize = screenManager;
 
         function screenManager() {
-            let screenWidth = document.body.clientWidth - pad * 2;
-            let mainPanelLeft = 0;
+            var screenWidth = document.body.clientWidth - pad * 2;
+            var mainPanelLeft = 0;
 
             if(screenWidth < minWidth) {
                 mainPanelLeft = pad;
@@ -245,20 +228,8 @@
         }
         screenManager();
     </script>
-    <script type="module">
-        // import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
-        import * as THREE from './resources/three/three.module.js';
-        import { LineGeometry } from './resources/three/addons/LineGeometry.js';
-        import { LineMaterial } from './resources/three/addons/LineMaterial.js';
-        import { Line2 } from './resources/three/addons/Line2.js';
-        
-        window.THREE = THREE;
-        window.LineGeometry = LineGeometry;
-        window.LineMaterial = LineMaterial;
-        window.Line2 = Line2;
-    </script>
-    <!-- <script src="resources/scripts.js?v=24_0910" defer></script> -->
-    <script src="resources/scripts-compiled.js?v=24_1015" defer></script>
+    <!-- <script src="resources/scripts.js?v=24_1012"></script> -->
+    <script src="resources/scripts-compiled.js?v=24_1012"></script>
     <script>
         const hoverBtns = document.getElementsByClassName('hoverBtnWrapper');
         const hoverBtnMargin = Number(getComputedStyle(hoverBtns[0]).margin.slice(0, -2));
