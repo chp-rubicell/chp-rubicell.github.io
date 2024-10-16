@@ -25,29 +25,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1015" />
-    <script src="./resources/earcut.js"></script>
-    <script src="./resources/iddLibrary.js"></script>
-
-    <!-- <script type="importmap">
-        {
-            "imports": {
-                "three": "./resources/three/three.module.min.js",
-                "three/addons/": "./resources/three/addons/"
-                "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
-            }
-        }
-    </script> -->
-    <script type="module">
-
-        // import * as THREE from 'three';
-        // import * as THREE from './resources/three/three.module.min.js';
-        // import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
-
-        // console.log(new THREE.Vector3(0, 0, 0))
-
-        // import { CSS2DRenderer, CSS2DObject } from 'three/addons/CSS2DRenderer.js';
-    </script>
+    <script src="./resources/lib/three.js"></script>
+    <script src="./resources/lib/LineMaterial.js"></script>
+    <script src="./resources/lib/LineSegmentsGeometry.js"></script>
+    <script src="./resources/lib/LineGeometry.js"></script>
+    <script src="./resources/lib/LineSegments2.js"></script>
+    <script src="./resources/lib/Line2.js"></script>
+    <script src="./resources/lib/earcut.js"></script>
+    <script src="./resources/lib/iddLibrary.js"></script>
 </head>
 
 <body>
@@ -179,7 +164,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-10-15</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-10-16</a></b>
                 </small></p>
             </div>
 
@@ -245,20 +230,8 @@
         }
         screenManager();
     </script>
-    <script type="module">
-        // import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js';
-        import * as THREE from './resources/three/three.module.js';
-        import { LineGeometry } from './resources/three/addons/LineGeometry.js';
-        import { LineMaterial } from './resources/three/addons/LineMaterial.js';
-        import { Line2 } from './resources/three/addons/Line2.js';
-        
-        window.THREE = THREE;
-        window.LineGeometry = LineGeometry;
-        window.LineMaterial = LineMaterial;
-        window.Line2 = Line2;
-    </script>
-    <!-- <script src="resources/scripts.js?v=24_0910" defer></script> -->
-    <script src="resources/scripts-compiled.js?v=24_1015" defer></script>
+    <!-- <script src="resources/scripts.js?v=24_1015" defer></script> -->
+    <script src="resources/scripts-compiled.js?v=24_1016" defer></script>
     <script>
         const hoverBtns = document.getElementsByClassName('hoverBtnWrapper');
         const hoverBtnMargin = Number(getComputedStyle(hoverBtns[0]).margin.slice(0, -2));

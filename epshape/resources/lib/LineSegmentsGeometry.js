@@ -1,18 +1,8 @@
-import {
-	Box3,
-	Float32BufferAttribute,
-	InstancedBufferGeometry,
-	InstancedInterleavedBuffer,
-	InterleavedBufferAttribute,
-	Sphere,
-	Vector3,
-	WireframeGeometry
-} from '../three.module.js';
 
-const _box = new Box3();
-const _vector = new Vector3();
+const _boxLSG = new THREE.Box3();
+const _vectorLSG = new THREE.Vector3();
 
-class LineSegmentsGeometry extends InstancedBufferGeometry {
+class LineSegmentsGeometry extends THREE.InstancedBufferGeometry {
 
 	constructor() {
 
@@ -27,8 +17,8 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 		const index = [ 0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5 ];
 
 		this.setIndex( index );
-		this.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+		this.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+		this.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 	}
 
@@ -77,10 +67,10 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		}
 
-		const instanceBuffer = new InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
+		const instanceBuffer = new THREE.InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
 
-		this.setAttribute( 'instanceStart', new InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
-		this.setAttribute( 'instanceEnd', new InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+		this.setAttribute( 'instanceStart', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
+		this.setAttribute( 'instanceEnd', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
 
 		//
 
@@ -105,10 +95,10 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		}
 
-		const instanceColorBuffer = new InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
+		const instanceColorBuffer = new THREE.InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
 
-		this.setAttribute( 'instanceColorStart', new InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
-		this.setAttribute( 'instanceColorEnd', new InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
+		this.setAttribute( 'instanceColorStart', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
+		this.setAttribute( 'instanceColorEnd', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
 
 		return this;
 
@@ -132,7 +122,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	fromMesh( mesh ) {
 
-		this.fromWireframeGeometry( new WireframeGeometry( mesh.geometry ) );
+		this.fromWireframeGeometry( new THREE.WireframeGeometry( mesh.geometry ) );
 
 		// set colors, maybe
 
@@ -156,7 +146,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		if ( this.boundingBox === null ) {
 
-			this.boundingBox = new Box3();
+			this.boundingBox = new THREE.Box3();
 
 		}
 
@@ -167,9 +157,9 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 			this.boundingBox.setFromBufferAttribute( start );
 
-			_box.setFromBufferAttribute( end );
+			_boxLSG.setFromBufferAttribute( end );
 
-			this.boundingBox.union( _box );
+			this.boundingBox.union( _boxLSG );
 
 		}
 
@@ -179,7 +169,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		if ( this.boundingSphere === null ) {
 
-			this.boundingSphere = new Sphere();
+			this.boundingSphere = new THREE.Sphere();
 
 		}
 
@@ -202,11 +192,11 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 			for ( let i = 0, il = start.count; i < il; i ++ ) {
 
-				_vector.fromBufferAttribute( start, i );
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+				_vectorLSG.fromBufferAttribute( start, i );
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vectorLSG ) );
 
-				_vector.fromBufferAttribute( end, i );
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector ) );
+				_vectorLSG.fromBufferAttribute( end, i );
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vectorLSG ) );
 
 			}
 
@@ -237,5 +227,3 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 	}
 
 }
-
-export { LineSegmentsGeometry };

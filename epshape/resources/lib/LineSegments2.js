@@ -1,35 +1,21 @@
-import {
-	Box3,
-	InstancedInterleavedBuffer,
-	InterleavedBufferAttribute,
-	Line3,
-	MathUtils,
-	Matrix4,
-	Mesh,
-	Sphere,
-	Vector3,
-	Vector4
-} from '../three.module.js';
-import { LineSegmentsGeometry } from './LineSegmentsGeometry.js';
-import { LineMaterial } from './LineMaterial.js';
 
-const _viewport = new Vector4();
+const _viewport = new THREE.Vector4();
 
-const _start = new Vector3();
-const _end = new Vector3();
+const _start = new THREE.Vector3();
+const _end = new THREE.Vector3();
 
-const _start4 = new Vector4();
-const _end4 = new Vector4();
+const _start4 = new THREE.Vector4();
+const _end4 = new THREE.Vector4();
 
-const _ssOrigin = new Vector4();
-const _ssOrigin3 = new Vector3();
-const _mvMatrix = new Matrix4();
-const _line = new Line3();
-const _closestPoint = new Vector3();
+const _ssOrigin = new THREE.Vector4();
+const _ssOrigin3 = new THREE.Vector3();
+const _mvMatrix = new THREE.Matrix4();
+const _line = new THREE.Line3();
+const _closestPoint = new THREE.Vector3();
 
-const _box = new Box3();
-const _sphere = new Sphere();
-const _clipToWorldVector = new Vector4();
+const _box = new THREE.Box3();
+const _sphere = new THREE.Sphere();
+const _clipToWorldVector = new THREE.Vector4();
 
 let _ray, _lineWidth;
 
@@ -66,8 +52,8 @@ function raycastWorldUnits( lineSegments, intersects ) {
 
 		_line.applyMatrix4( matrixWorld );
 
-		const pointOnLine = new Vector3();
-		const point = new Vector3();
+		const pointOnLine = new THREE.Vector3();
+		const point = new THREE.Vector3();
 
 		_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
 		const isInside = point.distanceTo( pointOnLine ) < _lineWidth * 0.5;
@@ -189,7 +175,7 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
 		_line.at( param, _closestPoint );
 
 		// check if the intersection point is within clip space
-		const zPos = MathUtils.lerp( _start4.z, _end4.z, param );
+		const zPos = THREE.MathUtils.lerp( _start4.z, _end4.z, param );
 		const isInClipSpace = zPos >= - 1 && zPos <= 1;
 
 		const isInside = _ssOrigin3.distanceTo( _closestPoint ) < _lineWidth * 0.5;
@@ -202,8 +188,8 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
 			_line.start.applyMatrix4( matrixWorld );
 			_line.end.applyMatrix4( matrixWorld );
 
-			const pointOnLine = new Vector3();
-			const point = new Vector3();
+			const pointOnLine = new THREE.Vector3();
+			const point = new THREE.Vector3();
 
 			_ray.distanceSqToSegment( _line.start, _line.end, point, pointOnLine );
 
@@ -224,7 +210,7 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
 
 }
 
-class LineSegments2 extends Mesh {
+class LineSegments2 extends THREE.Mesh {
 
 	constructor( geometry = new LineSegmentsGeometry(), material = new LineMaterial( { color: Math.random() * 0xffffff } ) ) {
 
@@ -256,10 +242,10 @@ class LineSegments2 extends Mesh {
 
 		}
 
-		const instanceDistanceBuffer = new InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
+		const instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
 
-		geometry.setAttribute( 'instanceDistanceStart', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
-		geometry.setAttribute( 'instanceDistanceEnd', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+		geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
+		geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
 		return this;
 
@@ -286,7 +272,7 @@ class LineSegments2 extends Mesh {
 
 		_lineWidth = material.linewidth + threshold;
 
-		// check if we intersect the sphere bounds
+		// check if we intersect the THREE.sphere bounds
 		if ( geometry.boundingSphere === null ) {
 
 			geometry.computeBoundingSphere();
@@ -295,7 +281,7 @@ class LineSegments2 extends Mesh {
 
 		_sphere.copy( geometry.boundingSphere ).applyMatrix4( matrixWorld );
 
-		// increase the sphere bounds by the worst case line screen space width
+		// increase the THREE.sphere bounds by the worst case line screen space width
 		let sphereMargin;
 		if ( worldUnits ) {
 
@@ -372,5 +358,3 @@ class LineSegments2 extends Mesh {
 	}
 
 }
-
-export { LineSegments2 };

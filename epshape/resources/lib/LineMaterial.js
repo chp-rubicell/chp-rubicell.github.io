@@ -1,16 +1,9 @@
-import {
-	ShaderLib,
-	ShaderMaterial,
-	UniformsLib,
-	UniformsUtils,
-	Vector2,
-} from '../three.module.js';
 
-UniformsLib.line = {
+THREE.UniformsLib.line = {
 
 	worldUnits: { value: 1 },
 	linewidth: { value: 1 },
-	resolution: { value: new Vector2( 1, 1 ) },
+	resolution: { value: new THREE.Vector2( 1, 1 ) },
 	dashOffset: { value: 0 },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
@@ -18,21 +11,16 @@ UniformsLib.line = {
 
 };
 
-ShaderLib[ 'line' ] = {
+THREE.ShaderLib[ 'line' ] = {
 
-	uniforms: UniformsUtils.merge( [
-		UniformsLib.common,
-		UniformsLib.fog,
-		UniformsLib.line
+	uniforms: THREE.UniformsUtils.merge( [
+		THREE.UniformsLib.common,
+		THREE.UniformsLib.fog,
+		THREE.UniformsLib.line
 	] ),
 
 	vertexShader:
 	/* glsl */`
-		#include <common>
-		#include <color_pars_vertex>
-		#include <fog_pars_vertex>
-		#include <logdepthbuf_pars_vertex>
-		#include <clipping_planes_pars_vertex>
 
 		uniform float linewidth;
 		uniform vec2 resolution;
@@ -233,10 +221,6 @@ ShaderLib[ 'line' ] = {
 
 			vec4 mvPosition = ( position.y < 0.5 ) ? start : end; // this is an approximation
 
-			#include <logdepthbuf_vertex>
-			#include <clipping_planes_vertex>
-			#include <fog_vertex>
-
 		}
 		`,
 
@@ -274,12 +258,6 @@ ShaderLib[ 'line' ] = {
 
 		#endif
 
-		#include <common>
-		#include <color_pars_fragment>
-		#include <fog_pars_fragment>
-		#include <logdepthbuf_pars_fragment>
-		#include <clipping_planes_pars_fragment>
-
 		vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
 
 			float mua;
@@ -310,8 +288,6 @@ ShaderLib[ 'line' ] = {
 		}
 
 		void main() {
-
-			#include <clipping_planes_fragment>
 
 			#ifdef USE_DASH
 
@@ -389,21 +365,13 @@ ShaderLib[ 'line' ] = {
 
 			vec4 diffuseColor = vec4( diffuse, alpha );
 
-			#include <logdepthbuf_fragment>
-			#include <color_fragment>
-
 			gl_FragColor = vec4( diffuseColor.rgb, alpha );
-
-			#include <tonemapping_fragment>
-			#include <colorspace_fragment>
-			#include <fog_fragment>
-			#include <premultiplied_alpha_fragment>
 
 		}
 		`
 };
 
-class LineMaterial extends ShaderMaterial {
+class LineMaterial extends THREE.ShaderMaterial {
 
 	constructor( parameters ) {
 
@@ -411,10 +379,10 @@ class LineMaterial extends ShaderMaterial {
 
 			type: 'LineMaterial',
 
-			uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
+			uniforms: THREE.UniformsUtils.clone( THREE.ShaderLib[ 'line' ].uniforms ),
 
-			vertexShader: ShaderLib[ 'line' ].vertexShader,
-			fragmentShader: ShaderLib[ 'line' ].fragmentShader,
+			vertexShader: THREE.ShaderLib[ 'line' ].vertexShader,
+			fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader,
 
 			clipping: true // required for clipping support
 
@@ -599,5 +567,3 @@ class LineMaterial extends ShaderMaterial {
 	}
 
 }
-
-export { LineMaterial };
