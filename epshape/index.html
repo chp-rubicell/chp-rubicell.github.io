@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1015" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1120" />
     <script src="./resources/lib/three.js"></script>
     <script src="./resources/lib/LineMaterial.js"></script>
     <script src="./resources/lib/LineSegmentsGeometry.js"></script>
@@ -76,23 +76,58 @@
                     <div class="settingsCloseBtn" onclick="settingsPanelVisibility(0);"></div>
 
                     <div id="SettingsPanelContent" class="panelContent">
-                        <!-- <input type="checkbox" name="xxx" value="yyy" checked> Test -->
-                        <!-- <div class="settingsPanelBlock">
-                            <h5>Zone Visibility</h5>
 
+                        <div class="settingsPanelBlock">
+                            <h5>Visual</h5>
+                    
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsMatTrans" type="checkbox" onclick="turnOnTransparentMat(this.checked);" checked /> Transparent materials
+                            </label>
+                            <span class="settingsFlexSpan">
+                                <span style="width:19px; flex:none; text-align:center; font-size:8px; line-height:8px; opacity:0.7;">⬤</span>
+                                <span style="flex:none;">&nbsp;Window opacity :&nbsp;</span>
+                                <input id="SttgsWinOpac" class="settingsInput" type="number" value="0.3" placeholder="0.3" step="any" onkeyup="updateWindowOpacityInputfield(event, this);" onfocusout="updateWindowOpacityInputfield(undefined, this);" />
+                            </span>
+                            <span class="settingsFlexSpan">
+                                <label id="SttgsLineThkCheckbox" style="padding-right: 10px;"><input type="checkbox" onclick="turnOnLineThickness(this.checked);"> Edge thickness :</label>
+                                <input id="SttgsLineThkInputfield" class="settingsInput" type="text" value="-" placeholder="1" step="any" onkeyup="updateLineThicknessInputfield(event, this);" onfocusout="updateLineThicknessInputfield(undefined, this);" disabled />
+                            </span>
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsShadow" type="checkbox" onclick="turnOnShadow(this.checked);" /> Shadow <font color="color="#8f4242"><b>(experimental)</b></font>
+                            </label>
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsDebug" type="checkbox" onclick="turnOnDebug(this.checked);" /> Debug
+                            </label>
+                    
+                        </div>
+
+                        <div class="settingsPanelBlock">
+                            <h5>Background</h5>
+                    
                             <center>
-                                <button class="settingsPanelButton">Select all</button>
-                                <button class="settingsPanelButton">Deselect all</button>
+                                <button class="settingsPanelButton changeBackgroundColorBtn" onclick="changeBackgroundColor(0, this);">Black</button>
+                                <button class="settingsPanelButton changeBackgroundColorBtn changeBgColorBtnHighlighted" onclick="changeBackgroundColor(1, this);" disabled>White</button>
+                                <button class="settingsPanelButton changeBackgroundColorBtn" onclick="changeBackgroundColor(-1, this);">Transparent</button>
+                            </center>
+                        </div>
+
+                        <div class="settingsPanelBlock">
+                            <h5>Zone Visibility</h5>
+                    
+                            <center>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(true);">Select all</button>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(false);">Deselect all</button>
                             </center>
 
-                            <label><input type="checkbox" checked>TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest</label>
-                            <label><input type="checkbox" checked>TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest</label>
-                            <label><input type="checkbox" checked>TestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTestTest</label>
-                        </div> -->
+                            <div id="SettingsPanelBlockZones" style="width:100%">
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
                 <div id="HelpPanel" class="glass defaultPanel" style="width: 500px;">
+                    <div class="panelTitle">Help</div>
                     <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1); hoverBtnVisibility(1);"></div>
 
                     <div class="panelContent">
@@ -118,12 +153,15 @@
                                 <li><b>r : </b>Reset camera view.</li>
                                 <li><b>s : </b>Export viewport as image.</li>
                                 <li><b>/ : </b>Start command input.</li>
+                                <li><b>ctrl + shift + c : </b>Copy viewport settings.</li>
+                                <li><b>ctrl + shift + v : </b>Paste viewport settings.</li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
                 <div id="CommandPanel" class="glass defaultPanel" style="width: 500px;">
+                    <div class="panelTitle">Commands</div>
                     <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1);"></div>
 
                     <div class="panelContent">
@@ -155,6 +193,44 @@
                     </div>
                 </div>
 
+                <div id="CopyPanel" class="glass defaultPanel" style="width: 300px; padding: 60px 0px 60px;">
+                    <div class="panelTitle">Copy settings</div>
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1); hoverBtnVisibility(1);"></div>
+
+                    <div class="panelContent">
+                        <div class="settingsPanelBlock">
+                            <h5>Visual</h5>
+
+                            <center>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, true);">Select all</button>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, false);">Deselect all</button>
+                            </center>
+                    
+                            <label><input type="checkbox" data-tag="mt" checked> Material transparency</label>
+                            <label><input type="checkbox" data-tag="wo" checked> Window opacity</label>
+                            <label><input type="checkbox" data-tag="et" checked> Edge thickness</label>
+                            <label><input type="checkbox" data-tag="st" checked> Shadow toggle</label>
+                            <label><input type="checkbox" data-tag="ss" checked> Shadow settings</label>
+                            <label><input type="checkbox" data-tag="dg" checked> Debug</label>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Camera</h5>
+
+                            <center>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, true);">Select all</button>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, false);">Deselect all</button>
+                            </center>
+                    
+                            <label><input type="checkbox" data-tag="cp" checked> Camera base position</label>
+                            <label><input type="checkbox" data-tag="ca" checked> Camera altitude</label>
+                            <label><input type="checkbox" data-tag="cz" checked> Camera azimuth</label>
+                            <label><input type="checkbox" data-tag="cr" checked> Camera distance</label>
+                        </div>
+                    </div>
+
+                    <button class="solidPanelButton" onclick="copySettings();">Copy</button>
+                </div>
+
                 <div id="CommandListener" class="glass"></div>
 
             </div>
@@ -164,7 +240,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-10-16</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-11-20</a></b>
                 </small></p>
             </div>
 
@@ -231,7 +307,7 @@
         screenManager();
     </script>
     <!-- <script src="resources/scripts.js?v=24_1015" defer></script> -->
-    <script src="resources/scripts-compiled.js?v=24_1021" defer></script>
+    <script src="resources/scripts-compiled.js?v=24_1120" defer></script>
     <script>
         const hoverBtns = document.getElementsByClassName('hoverBtnWrapper');
         const hoverBtnMargin = Number(getComputedStyle(hoverBtns[0]).margin.slice(0, -2));
@@ -328,9 +404,10 @@
 
         const commandPanel = document.getElementById('CommandPanel');
         const helpPanel = document.getElementById('HelpPanel');
+        const copyPanel = document.getElementById('CopyPanel');
+        const panels = [commandPanel, helpPanel, copyPanel];
 
-        panelVisibility(commandPanel, -1);
-        panelVisibility(helpPanel, -1);
+        panelVisibilityAll(-1);
         
         function panelVisibility(panel, toggle=0) {
             if (toggle <= 0) {
@@ -350,6 +427,13 @@
                 panel.classList.add('fadein');
             }
         }
+
+        function panelVisibilityAll(toggle=0) {
+            for (const panel of panels) {
+                panelVisibility(panel, toggle);
+            }
+        }
+
     </script>
 
 </body>

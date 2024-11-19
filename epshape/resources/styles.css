@@ -248,7 +248,8 @@ span {
     padding-right: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
-    transition: box-shadow 0.5s, background-color 0.5s;;
+    transition: box-shadow 0.5s, background-color 0.5s;
+    backdrop-filter: blur(10px);
 }
 button.glass:hover {
     background-color: rgba(240,245,247,0.8);
@@ -281,7 +282,7 @@ button.glass:active, .customButton:focus {
     padding: 60px 0px 20px;
     visibility: hidden;
     opacity: 0;
-    background-color: rgba(240,245,247,0.7);
+    background-color: rgba(240,245,247,0.75);
     line-height: 1.5;
 }
 
@@ -374,9 +375,13 @@ button.glass:active, .customButton:focus {
     /* scrollbar-gutter: stable both-edges; */
     scrollbar-gutter: stable;
     border-radius: 0px;
-    scrollbar-color: #26272Cd0 #26272C00;
 }
-
+@-moz-document url-prefix() {
+    .panelContent {
+        scrollbar-color: #26272Cd0 #26272C00;
+        padding: 0px 20px 0px 20px;
+    }
+}
 
 
 .panelContent::-webkit-scrollbar {
@@ -501,6 +506,32 @@ button.glass:active, .customButton:focus {
     color: rgba(240,245,247,0.7);
 }
 
+.solidPanelButton {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 1.1em;
+    border: 0px;
+    color: rgba(240,245,247);
+    background: #112C44b0;
+    /* background: none; */
+    /* border: 2px solid #112C4460; */
+    padding: 6px 30px 6px;
+    border-radius: 30px;
+}
+.solidPanelButton:enabled:hover {
+    border: 0px;
+    background-color: #112C4460;
+}
+.solidPanelButton:enabled:active {
+    border: 0px;
+    background-color: #112C44;
+    color: rgba(240,245,247,0.7);
+}
+
 .settingsFlexSpan {
     width:100%;
     display: flex;
@@ -609,17 +640,7 @@ input[type=number] {
     background-color: #112C4440;
 }
 
-#CommandPanel::before {
-    content: "Commands";
-    position: absolute;
-    top: 12px;
-    left: 20px;
-    font-size: 25px;
-    font-weight: bold;
-}
-
-#HelpPanel::before {
-    content: "Help";
+.panelTitle {
     position: absolute;
     top: 12px;
     left: 20px;
