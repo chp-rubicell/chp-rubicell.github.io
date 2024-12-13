@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="theme-color" content="#292A2F" />
+    <!-- Sets the status bar style to transparent -->
+    <!-- <meta name="apple-mobile-web-app-capable" content="yes" /> -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <meta name='title' property='og:title' content='EP Shape Previewer'/>
+    <meta name='author' content='Chul-Hong Park'>
+    <meta name='description' property='og:description' content='Shape previewer for EnergyPlus models'/>
+    <meta property='og:url' content='https://chp-rubicell.github.io/epshape/'/>
+    <meta name='image' property='og:image' content='https://chp-rubicell.github.io/epshape/resources/imgs/thumbnail.jpg'/>
+    <meta name='twitter:image' content='https://chp-rubicell.github.io/epshape/resources/imgs/thumbnail.jpg' />
+    <meta property='og:image:width' content='1200' />
+    <meta property='og:image:height' content='627' />
+    <meta property='og:type' content='website' />
+    <link rel="icon" href="https://chp-rubicell.github.io/epshape/resources/imgs/favicon.png">
+    <title>EP Shape Previewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1120" />
+    <script src="./resources/lib/three.js"></script>
+    <script src="./resources/lib/LineMaterial.js"></script>
+    <script src="./resources/lib/LineSegmentsGeometry.js"></script>
+    <script src="./resources/lib/LineGeometry.js"></script>
+    <script src="./resources/lib/LineSegments2.js"></script>
+    <script src="./resources/lib/Line2.js"></script>
+    <script src="./resources/lib/earcut.js"></script>
+    <script src="./resources/lib/iddLibrary.js"></script>
+</head>
+
+<body>
+
+    <!-- <div class="bg" style="background-image: url('resources/bg.jpg');"></div> -->
+
+    <div id="fileHoverMask" class="bg" style="z-index: 21; display: none;"></div>
+
+
+    <div id="PageWrapper">
+
+        <div id="MainPanel">
+
+            <h2>
+                <img height="40px" src="resources/imgs/eplogo.png" style="vertical-align: middle;"/>
+                EnergyPlus Shape Previewer
+            </h2>
+            <div style="width: 100%; height: auto; text-align: right; display: block; margin-top: 10px; margin-bottom: 15px;">
+                <div id="fileSelectorTag"></div>
+                &nbsp;
+                <label id="fileSelectorBtn" class="customButton" for="fileSelector">IDF File</label>
+                <input id="fileSelector" type="file" accept=".txt, .idf" style="display:none;">
+            </div>
+
+            <div id="CanvasContainer" oncontextmenu="return false;" style="position: relative; background-color: white;" draggable="false">
+
+                <div id="objectDisplay" class="whitemode"></div>
+
+                <div id="fileHover" class="bg" style="background: radial-gradient(#000000a0, #00000000); z-index: 20; display: none;"><p id="fileHoverText">drop to load file</p></div>
+                
+
+                <div class="hoverBtnWrapper" style="right: 0px;">
+                    <button id="HelpBtn" class="hoverBtn glass" onclick="panelVisibility(helpPanel, 1); hoverBtnVisibility(-1);"></button>
+                </div>
+                <div class="hoverBtnWrapper" style="right: 40px;">
+                    <button id="SaveBtn" class="hoverBtn glass" onclick="exportImage();"></button>
+                    <button id="SettingsBtn" class="hoverBtn glass" onclick="settingsPanelVisibility(1);"></button>
+                </div>
+
+                <div id="SettingsPanel" class="glass defaultPanel" style="width: 350px;">
+                    <div class="settingsCloseBtn" onclick="settingsPanelVisibility(0);"></div>
+
+                    <div id="SettingsPanelContent" class="panelContent">
+
+                        <div class="settingsPanelBlock">
+                            <h5>Visual</h5>
+                    
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsMatTrans" type="checkbox" onclick="turnOnTransparentMat(this.checked);" checked /> Transparent materials
+                            </label>
+                            <span class="settingsFlexSpan">
+                                <span style="width:19px; flex:none; text-align:center; font-size:8px; line-height:8px; opacity:0.7;">⬤</span>
+                                <span style="flex:none;">&nbsp;Window opacity :&nbsp;</span>
+                                <input id="SttgsWinOpac" class="settingsInput" type="number" value="0.3" placeholder="0.3" step="any" onkeyup="updateWindowOpacityInputfield(event, this);" onfocusout="updateWindowOpacityInputfield(undefined, this);" />
+                            </span>
+                            <span class="settingsFlexSpan">
+                                <label style="padding-right: 10px;"><input id="SttgsLineThkCheckbox" type="checkbox" onclick="turnOnLineThickness(this.checked);"> Edge thickness :</label>
+                                <input id="SttgsLineThkInputfield" class="settingsInput" type="text" value="-" placeholder="1" step="any" onkeyup="updateLineThicknessInputfield(event, this);" onfocusout="updateLineThicknessInputfield(undefined, this);" disabled />
+                            </span>
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsShadow" type="checkbox" onclick="turnOnShadow(this.checked);" /> Shadow</font>
+                            </label>
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsDebug" type="checkbox" onclick="turnOnDebug(this.checked);" /> Debug
+                            </label>
+                    
+                        </div>
+
+                        <div class="settingsPanelBlock">
+                            <h5>Background</h5>
+                    
+                            <center>
+                                <button class="settingsPanelButton changeBackgroundColorBtn" onclick="changeBackgroundColor(0, this);">Black</button>
+                                <button class="settingsPanelButton changeBackgroundColorBtn changeBgColorBtnHighlighted" onclick="changeBackgroundColor(1, this);" disabled>White</button>
+                                <button class="settingsPanelButton changeBackgroundColorBtn" onclick="changeBackgroundColor(-1, this);">Transparent</button>
+                            </center>
+                        </div>
+
+                        <div class="settingsPanelBlock">
+                            <h5>Zone Visibility</h5>
+                    
+                            <center>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(true);">Select all</button>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(false);">Deselect all</button>
+                            </center>
+
+                            <div id="SettingsPanelBlockZones" style="width:100%">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="HelpPanel" class="glass defaultPanel" style="width: 500px;">
+                    <div class="panelTitle">Help</div>
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1); hoverBtnVisibility(1);"></div>
+
+                    <div class="panelContent">
+                        <div class="settingsPanelBlock">
+                            <h5>Loading files</h5>
+                            <ul>
+                                <li><b>(file drop) : </b>Load .idf file.</li>
+                                <li><b>shift + (file drop) : </b>Load .idf file with current settings.</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Mouse</h5>
+                            <ul>
+                                <li><b>left mouse : </b>Rotate camera.</li>
+                                <li><b>shift + left mouse : </b>Snap camera angle.</li>
+                                <li><b>right mouse : </b>Pan camera.</li>
+                                <li><b>middle mouse : </b>Pan camera.</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Keyboard</h5>
+                            <ul>
+                                <li><b>r : </b>Reset camera view.</li>
+                                <li><b>s : </b>Export viewport as image.</li>
+                                <li><b>/ : </b>Start command input.</li>
+                                <li><b>ctrl + shift + c : </b>Copy viewport settings.</li>
+                                <li><b>ctrl + shift + v : </b>Paste viewport settings.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="CommandPanel" class="glass defaultPanel" style="width: 500px;">
+                    <div class="panelTitle">Commands</div>
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1);"></div>
+
+                    <div class="panelContent">
+                        <div class="settingsPanelBlock">
+                            <h5>Basics</h5>
+                            <ul>
+                                <li><b>help : </b>See the list of commands.</li>
+                                <li><b>↑ : </b>Insert last command.</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Camera</h5>
+                            <ul>
+                                <li><b>camerafar + (num) : </b>Set camera frustum far plane to (num).</li>
+                                <li><b>maxzoom + (num) : </b>Set max camera zoom distance to (num).</li>
+                            </ul>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Shadows</h5>
+                            <ul>
+                                <li><b>shadowalt + (num) : </b>Set shadow altitude to (num)°.</li>
+                                <li><b>shadowazm + (num) : </b>Set shadow azimuth to (num)°.</li>
+                                <li><b>shadowmapsize + (num) : </b>Set shadow map resolution to (num)×(num).</li>
+                                <li><b>shadowradius + (num) : </b>Set shadow blur to (num)×(num).</li>
+                                <li><b>shadowheight + (num) : </b>Set shadow plane height to (num)m.</li>
+                                <li><b>selfshadow + (on/off) : </b>Toggle self shadow.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="CopyPanel" class="glass defaultPanel" style="width: 300px; padding: 60px 0px 60px;">
+                    <div class="panelTitle">Copy settings</div>
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1); hoverBtnVisibility(1);"></div>
+
+                    <div class="panelContent">
+                        <div class="settingsPanelBlock">
+                            <h5>Visual</h5>
+
+                            <center>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, true);">Select all</button>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, false);">Deselect all</button>
+                            </center>
+                    
+                            <label><input type="checkbox" data-tag="mt" checked> Material transparency</label>
+                            <label><input type="checkbox" data-tag="wo" checked> Window opacity</label>
+                            <label><input type="checkbox" data-tag="et" checked> Edge thickness</label>
+                            <label><input type="checkbox" data-tag="st" checked> Shadow toggle</label>
+                            <label><input type="checkbox" data-tag="ss" checked> Shadow settings</label>
+                            <label><input type="checkbox" data-tag="dg" checked> Debug</label>
+                        </div>
+                        <div class="settingsPanelBlock">
+                            <h5>Camera</h5>
+
+                            <center>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, true);">Select all</button>
+                                <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, false);">Deselect all</button>
+                            </center>
+                    
+                            <label><input type="checkbox" data-tag="cp" checked> Camera base position</label>
+                            <label><input type="checkbox" data-tag="ca" checked> Camera altitude</label>
+                            <label><input type="checkbox" data-tag="cz" checked> Camera azimuth</label>
+                            <label><input type="checkbox" data-tag="cr" checked> Camera distance</label>
+                        </div>
+                    </div>
+
+                    <button class="solidPanelButton" onclick="copySettings();">Copy</button>
+                </div>
+
+                <div id="CommandListener" class="glass"></div>
+
+            </div>
+
+            <div class="panel" style="padding-top: 15px;">
+                <div class="separator"></div>
+                <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
+                <p><small>
+                    <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-11-20</a></b>
+                </small></p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const pad = 40;
+        const minWidth = 550;
+        const maxWidth = 1200;
+        const panelWidth = 1280;
+        const panelHeight = 800;
+        let canvMult = 1;
+        if (window.location.hash) {
+            hashStr = window.location.hash.replace('#', '').toLowerCase();
+            hashVal = parseFloat(hashStr);
+            if (!isNaN(hashVal)) {
+                canvMult = hashVal;
+            }
+            if (hashStr.endsWith('c')) {}
+        }
+        console.log('Canvas multiplier: ' + canvMult);
+        const canvWidth = parseInt(panelWidth * canvMult);
+        const canvHeight = parseInt(panelHeight * canvMult);
+
+        const MainPanel = document.getElementById('MainPanel');
+        const CanvasContainer = document.getElementById("CanvasContainer");
+        // const CanvasRenderer = document.getElementById("CanvasRenderer");
+
+        CanvasContainer.style.width = panelWidth+"px";
+        CanvasContainer.style.height = panelHeight+"px";
+        
+        let mainPanelWidth = 0;
+        let mainPanelHeight = 0;
+
+        window.onresize = screenManager;
+
+        function screenManager() {
+            let screenWidth = document.body.clientWidth - pad * 2;
+            let mainPanelLeft = 0;
+
+            if(screenWidth < minWidth) {
+                mainPanelLeft = pad;
+                mainPanelWidth = minWidth;
+            }
+            else if(screenWidth < maxWidth) {
+                mainPanelLeft = pad;
+                mainPanelWidth = screenWidth;
+            }
+            else {
+                mainPanelLeft = pad + (screenWidth - maxWidth) / 2;
+                mainPanelWidth = maxWidth;
+            }
+            mainPanelHeight = parseInt(mainPanelWidth * canvHeight / canvWidth);
+            MainPanel.style.marginLeft = mainPanelLeft + 'px';
+            MainPanel.style.marginRight = mainPanelLeft + 'px';
+            MainPanel.style.width = mainPanelWidth + 'px';
+            CanvasContainer.style.width = mainPanelWidth + 'px';
+            CanvasContainer.style.height = mainPanelHeight + 'px';
+            // CanvasRenderer.style.width = mainPanelWidth + 'px';
+            // CanvasRenderer.style.height = mainPanelWidth * canvHeight / canvWidth + 'px';
+        }
+        screenManager();
+    </script>
+    <!-- <script src="resources/scripts.js?v=24_1015" defer></script> -->
+    <script src="resources/scripts-compiled.js?v=24_1127" defer></script>
+    <script>
+        const hoverBtns = document.getElementsByClassName('hoverBtnWrapper');
+        const hoverBtnMargin = Number(getComputedStyle(hoverBtns[0]).margin.slice(0, -2));
+
+        const settingsPanel = document.getElementById('SettingsPanel');
+        
+        settingsPanelVisibility(-1);
+        for (const hoverBtn of hoverBtns) {
+            hoverBtn.classList.remove('fadeoutSlide');
+        }
+        hoverBtns[0].style.top = '0px';
+        hoverBtns[0].classList.add('fadeinSlide');
+        
+        function hoverBtnVisibility(toggle) {
+            if (toggle <= 0) {
+                // 닫기
+                for (const hoverBtn of hoverBtns) {
+                    hoverBtn.style.top = - hoverBtn.clientHeight - hoverBtnMargin*2 + 'px';
+                    hoverBtn.classList.remove('fadeinSlide');
+                    hoverBtn.classList.add('fadeoutSlide');
+                }
+            }
+            else {
+                // 열기
+                let hoverBtnsToChange = [];
+                if ((idfName||'') == '') {
+                    // 파일이 열리기 전
+                    hoverBtnsToChange = [hoverBtns[0]];
+                }
+                else {
+                    hoverBtnsToChange = [...hoverBtns];
+                }
+
+                for (const hoverBtn of hoverBtnsToChange) {
+                    hoverBtn.style.top = '0px';
+                    hoverBtn.classList.remove('fadeoutSlide');
+                    hoverBtn.classList.add('fadeinSlide');
+                }
+            }
+        }
+        
+        function settingsPanelVisibility(toggle=null) {
+            
+            for (const hoverBtn of hoverBtns) {
+                hoverBtn.blur();
+            }
+
+            if (toggle==undefined || toggle==null) {
+                if (clickable) toggle = 1;
+                else toggle = 0;
+            }
+
+            switch (toggle) {
+                case -1:
+                    // 모두 닫으려고 할 때
+                    clickable = false;
+                    hoverBtnVisibility(-1);
+
+                    settingsPanel.style.visibility = 'hidden';
+                    settingsPanel.style.opacity = 0;
+                    settingsPanel.classList.remove('fadein');
+                    settingsPanel.classList.add('fadeout');
+                    
+                    break;
+
+                case 0:
+                    // 창이 열려있을 때
+                    clickable = true;
+                    hoverBtnVisibility(1);
+
+                    settingsPanel.style.visibility = 'hidden';
+                    settingsPanel.style.opacity = 0;
+                    settingsPanel.classList.remove('fadein');
+                    settingsPanel.classList.add('fadeout');
+                    
+                    break;
+
+                case 1:
+                    // 창이 닫혀있을 때
+                    clickable = false;
+                    hoverBtnVisibility(-1);
+
+                    settingsPanel.style.visibility = 'visible';
+                    settingsPanel.style.opacity = 1;
+                    settingsPanel.classList.remove('fadeout');
+                    settingsPanel.classList.add('fadein');
+                    
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+
+        const commandPanel = document.getElementById('CommandPanel');
+        const helpPanel = document.getElementById('HelpPanel');
+        const copyPanel = document.getElementById('CopyPanel');
+        const panels = [commandPanel, helpPanel, copyPanel];
+
+        panelVisibilityAll(-1);
+        
+        function panelVisibility(panel, toggle=0) {
+            if (toggle <= 0) {
+                // 창 닫으려고 할 때
+                clickable = true;
+                panel.style.visibility = 'hidden';
+                panel.style.opacity = 0;
+                panel.classList.remove('fadein');
+                panel.classList.add('fadeout');
+            }
+            else {
+                // 창 열려고 할 때
+                clickable = false;
+                panel.style.visibility = 'visible';
+                panel.style.opacity = 1;
+                panel.classList.remove('fadeout');
+                panel.classList.add('fadein');
+            }
+        }
+
+        function panelVisibilityAll(toggle=0) {
+            for (const panel of panels) {
+                panelVisibility(panel, toggle);
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

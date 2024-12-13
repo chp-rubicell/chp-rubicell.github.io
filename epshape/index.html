@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1120" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1213" />
     <script src="./resources/lib/three.js"></script>
     <script src="./resources/lib/LineMaterial.js"></script>
     <script src="./resources/lib/LineSegmentsGeometry.js"></script>
@@ -33,6 +33,9 @@
     <script src="./resources/lib/Line2.js"></script>
     <script src="./resources/lib/earcut.js"></script>
     <script src="./resources/lib/iddLibrary.js"></script>
+    <script src="./resources/lib/exampleIDF.js"></script>
+    <!-- <script src="./resources/scripts.js?v=24_1015" defer></script> -->
+    <script src="./resources/scripts-compiled.js?v=24_1213" defer></script>
 </head>
 
 <body>
@@ -80,6 +83,9 @@
                         <div class="settingsPanelBlock">
                             <h5>Visual</h5>
                     
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsShading" type="checkbox" onclick="turnOnShading(this.checked);" checked /> Shading</font>
+                            </label>
                             <label style="padding-right: 10px;">
                                 <input id="SttgsMatTrans" type="checkbox" onclick="turnOnTransparentMat(this.checked);" checked /> Transparent materials
                             </label>
@@ -206,6 +212,7 @@
                                 <button class="settingsPanelButton" onclick="toggleCopyCheckboxes(this.parentElement.parentElement, false);">Deselect all</button>
                             </center>
                     
+                            <label><input type="checkbox" data-tag="sh" checked> Shading visibility</label>
                             <label><input type="checkbox" data-tag="mt" checked> Material transparency</label>
                             <label><input type="checkbox" data-tag="wo" checked> Window opacity</label>
                             <label><input type="checkbox" data-tag="et" checked> Edge thickness</label>
@@ -306,8 +313,6 @@
         }
         screenManager();
     </script>
-    <!-- <script src="resources/scripts.js?v=24_1015" defer></script> -->
-    <script src="resources/scripts-compiled.js?v=24_1127" defer></script>
     <script>
         const hoverBtns = document.getElementsByClassName('hoverBtnWrapper');
         const hoverBtnMargin = Number(getComputedStyle(hoverBtns[0]).margin.slice(0, -2));
