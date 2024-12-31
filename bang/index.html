@@ -1,0 +1,603 @@
+<HTML>
+
+<title></title>
+
+<head>
+
+<meta charset = "UTF-8">
+<meta name = "HandheldFriendly" content = "true" />
+<meta name = "viewport" content = "minimal-ui, width = device-width, initial-scale = 1.0, maximum-scale = 1.0, user-scalable = 0" />
+<meta name="theme-color" content="#3db9f9" />
+<link rel = "icon" type = "image/png" href = "favicon.png" />
+
+<meta name='title' property='og:title' content='Bang SC 2' />
+<meta name='author' content='C.H.Park'>
+<meta name='description' property='og:description' content='Scenario Cards for Bang! Board Game' />
+<meta property='og:url' content='https://chp-rubicell.github.io/bang/' />
+<meta name='image' property='og:image' content='https://chp-rubicell.github.io/bang/thumbnail.jpg' />
+<meta name='twitter:image' content='https://chp-rubicell.github.io/bang/thumbnail.jpg' />
+<meta property='og:image:width' content='1280' />
+<meta property='og:image:height' content='720' />
+<meta property='og:type' content='website' />
+
+<script>
+
+window.onresize = screenManager;
+
+var NAME = "Bang SC";
+var VERSION = "2.1.2";
+
+
+var WIDTH = 1280;
+var HEIGHT = 960;
+var screenWidth;
+var screenHeight;
+var zoomLevel = 1;
+var resLevel = 1;
+
+var barHeight = 100;
+
+var verMargin = true;
+var mainScreen = true;
+
+///////////////////
+///// Display /////
+///////////////////
+
+function screenManager() {
+
+	var gtTop;
+	var gtLeft;
+
+	screenWidth = document.body.clientWidth;
+	screenHeight = document.body.clientHeight;
+
+	if(WIDTH / HEIGHT > screenWidth / screenHeight) {
+		zoomLevel = screenWidth / WIDTH;
+		gtLeft = 0;
+		gtTop = (screenHeight / zoomLevel - HEIGHT) / 2;
+		verMargin = true;
+	}
+	else {
+		zoomLevel = screenHeight / HEIGHT;
+		gtLeft = (screenWidth / zoomLevel - WIDTH) / 2;
+		gtTop = 0;
+		verMargin = false;
+	}
+
+	resLevel = 1 / Math.sqrt(zoomLevel);
+
+	gamePanel.style.width = WIDTH + "px";
+	gamePanel.style.height = HEIGHT + "px";
+	gamePanel.style.left = gtLeft + "px";
+	gamePanel.style.top = gtTop + "px";
+	gamePanel.style.zoom = (zoomLevel * 100) + "%";
+	//gamePanel.style.background = "#00ff00";
+
+	backGamePanel.style.height = (HEIGHT * zoomLevel) + "px";
+	backGamePanel.style.top = (gtTop * zoomLevel) + "px";
+
+	/*
+	if(mainScreen) {
+		whiteScreen.style.display = "none";
+	}
+	else {
+		whiteScreen.style.height = ((HEIGHT - barHeight * resLevel) * zoomLevel) + "px";
+		whiteScreen.style.display = "block";
+	}
+	*/
+
+	if(verMargin) {
+		gradient1.style.height = (gtTop * zoomLevel) + "px";
+		gradient1.style.display = "block";
+
+		gradient2.style.height = (gtTop * zoomLevel) + "px";
+		gradient2.style.display = "block";
+	}
+	else {
+		gradient1.style.display = "none";
+		gradient2.style.display = "none";
+	}
+
+}
+
+
+// Card Design
+var cardWidth = 665;
+var cardHeight = 1022;
+var cardRadius = 51;
+
+var cardHeightMain = 800;
+var cardHeightPre = 650;
+
+function loadEngine() {
+
+	document.title = NAME + " " + VERSION;
+
+	versionText.innerHTML = VERSION;
+
+	screenSwap(0);
+
+	// Card Design
+	var cardWidthMain = cardWidth / cardHeight * cardHeightMain;
+	var cardRadiusMain = cardHeightMain / cardHeight * cardRadius;
+	var cardWidthPre = cardWidth / cardHeight * cardHeightPre;
+	var cardRadiusPre = cardHeightPre / cardHeight * cardRadius;
+
+	var marginX = 60;
+	var marginY = (HEIGHT - cardHeightMain) / 2;
+
+	scenarioMain.style.width = cardWidthMain + "px";
+	scenarioMain.style.height = cardHeightMain + "px";
+	scenarioMain.style.borderRadius = cardRadiusMain + "px";
+	scenarioMain.style.left = marginX + "px";
+	scenarioMain.style.bottom = marginY + "px";
+
+	scenarioPre.style.width = cardWidthPre + "px";
+	scenarioPre.style.height = cardHeightPre + "px";
+	scenarioPre.style.borderRadius = cardRadiusPre + "px";
+	scenarioPre.style.left = (marginX + cardWidthMain +50) + "px";
+	scenarioPre.style.bottom = marginY + "px";
+
+	scenarioName.style.top = (marginY + 10) + "px";
+	scenarioName.style.right = "0px";
+	scenarioName.style.width = (WIDTH - cardWidthMain - marginX) + "px";
+
+}
+
+var screenState = 0;
+
+function screenSwap(code) {
+
+	screenState = code;
+
+	mainPanel.style.display = "none";
+	creditPanel.style.display = "none";
+	scenarioPanel.style.display = "none";
+	scenarioMixPanel.style.display = "none";
+	scenarioMenuPanel.style.display = "none";
+	scenarioMenuBack.style.display = "none";
+	//characterPanel.style.display = "none";
+
+	switch(code) {
+		case -1:
+			if(firstScenario) screenSwap(3);
+			else screenSwap(2);
+			break;
+		case 0:
+			mainPanel.style.display = "block";
+			break;
+		case 1:
+			creditPanel.style.display = "block";
+			break;
+		case 2:
+			scenarioPanel.style.display = "block";
+			break;
+		case 3:
+			scenarioMixPanel.style.display = "block";
+			break;
+		case 4:
+			scenarioPanel.style.display = "block";
+			scenarioMenuPanel.style.display = "block";
+			if(!firstScenario) scenarioMenuBack.style.display = "block";
+			break;
+		case 5:
+			characterPanel.style.display = "block";
+			break;
+	}
+
+}
+
+
+////////////////////
+///// Scenario /////
+////////////////////
+
+var pack = 0;  // 순번
+//var packName = "name";  // 이름
+//var packCode = "folder";  // 폴더명
+//var packNum = 0;  // 카드 개수
+
+var currentCard = 0;
+
+var packName = new Array('High Noon', 'A Fistful of Cards', 'Wild West Show', 'Mixed');
+var packCode = new Array('1highnoon', '2afoc', '3wws', '4mixed');
+var packNum = new Array(13, 15, 10, 27);
+var totalCard = packNum[pack];
+var finalCardPack;
+
+var firstScenario = true;
+
+var scenarioArray = new Array();
+
+
+function shuffleArray(array) {
+	var tempS, currS, topS = array.length;
+
+	if(topS) while(--topS) {
+		currS = Math.floor(Math.random() * (topS + 1));
+		tempS = array[currS];
+		array[currS] = array[topS];
+		array[topS] = tempS;
+	}
+
+	return array;
+}
+
+function loadScenario(type) {
+
+	startButtonText.innerHTML = "Continue";
+
+	firstScenario = false;
+
+	// 카드 팩 설정
+
+	pack = type;
+	totalCard = packNum[pack];
+	finalCardPack = packCode[pack];
+
+	if(pack == 3) {
+		totalCard = packNum[1];
+		finalCardPack = packCode[Math.round(Math.random())]
+	}
+
+	scenarioName.innerHTML = packName[pack];
+
+
+	// 카드 팩 초기화
+
+	currentCard = 0;
+
+	scenarioArray = new Array();
+
+	for (var i = 0; i < packNum[pack] - 1; i++) {
+		scenarioArray[i] = i + 1;
+	}
+
+	scenarioArray = shuffleArray(scenarioArray);
+
+	changeScenario();
+
+	screenSwap(2);
+
+}
+
+function nextScenario(direction) {
+
+	// 이전 카드
+	if(direction < 0 && currentCard > 0) {
+		currentCard --;
+		changeScenario();
+	}
+
+	// 다음 카드
+	if(direction > 0 && currentCard < totalCard) {
+		currentCard ++;
+		changeScenario();
+	}
+
+}
+
+function cardCode(seq) {
+	return (("0" + seq).slice(-2));
+}
+
+function cardUrl(packFolder, num) {
+	var currentSeq;
+
+	if(num == -1) currentSeq = 0;
+	else {
+		currentSeq = scenarioArray[num];
+
+		if(pack == 3) {
+			if(currentSeq <= 12) {
+				packFolder = packCode[0];
+			}
+			else {
+				currentSeq -= 12;
+				packFolder = packCode[1];
+			}
+		}
+	}
+
+	return ("url(Cards/" + packFolder + "/card" + cardCode(currentSeq) + ".jpg)");
+}
+
+function changeScenario() {
+
+	var packFolder = packCode[pack];
+
+	var currIn = "<b>" + currentCard + "</b><font size = '50px'>/" + totalCard + "</font>";
+	currText.innerHTML = currIn;
+
+	scenarioNextTag.style.display = "block";
+
+	if(currentCard == 0) {
+		scenarioMain.style.background = "rgba(255, 255, 255, 0.6)";
+
+		scenarioPre.style.background = cardUrl(packFolder, currentCard);
+		scenarioPre.style.backgroundSize = "100% 100%";
+	}
+	else if(currentCard == totalCard - 1) {
+		scenarioMain.style.background = cardUrl(packFolder, currentCard - 1);
+		scenarioMain.style.backgroundSize = "100% 100%";
+
+		scenarioPre.style.background = cardUrl(finalCardPack, -1);
+		scenarioPre.style.backgroundSize = "100% 100%";
+	}
+	else if(currentCard == totalCard) {
+		scenarioMain.style.background = cardUrl(finalCardPack, -1);
+		scenarioMain.style.backgroundSize = "100% 100%";
+
+		scenarioPre.style.background = "rgba(255, 255, 255, 0.6)";
+
+		scenarioNextTag.style.display = "none";
+	}
+	else {
+		scenarioMain.style.background = cardUrl(packFolder, currentCard - 1);
+		scenarioMain.style.backgroundSize = "100% 100%";
+
+		scenarioPre.style.background = cardUrl(packFolder, currentCard);
+		scenarioPre.style.backgroundSize = "100% 100%";
+	}
+
+	// Wild West Show
+	if(pack == 2) {
+		scenarioNextTag.style.display = "none";
+
+		scenarioPre.style.background = "rgba(0, 0, 0, 0.6)";
+	}
+
+}
+
+
+/////////////////////
+///// Character /////
+/////////////////////
+
+function characterCard() {
+
+}
+
+</script>
+
+<style>
+
+@font-face {
+	font-family: 'Roboto';
+	src: url(Fonts/Roboto-Light.woff);
+}
+
+@font-face {
+	font-family:'Roboto';
+	src: url(Fonts/Roboto-Bold.woff);
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: 'RobotoCondensed';
+	src: url(Fonts/RobotoCondensed-Light.woff);
+}
+
+@font-face {
+	font-family:'RobotoCondensed';
+	src: url(Fonts/RobotoCondensed-Bold.woff);
+	font-weight: bold;
+}
+
+body {
+	font-family: "Roboto", "sans-serif";
+	margin: 0px;
+	padding: 0px;
+	overflow: hidden;
+	background: #000000;
+}
+
+div {
+	position: absolute;
+	cursor: default;
+	color: #ffffff;
+}
+
+.backPanelTexture {
+	width: 100%;
+	height: 100%;
+	background: url(Textures/txLarge.jpg);
+	background-position: 50% 50%;
+	background-size: cover;
+}
+
+#backGamePanel {
+	width: 100%;
+}
+
+#whiteScreen {
+	width: 100%;
+	height: 100%;
+	background: #ffffff;
+}
+
+#mainLogo {
+	width: 600px;
+	height: 600px;
+	top: 0px;
+	left: 100px;
+	background: url(Textures/txTitle.png);
+	background-size: 100% 100%;
+}
+
+.mainButton {
+	width: 400px;
+	height: 100px;
+	top: 650px;
+}
+
+.mainButtonText {
+	width: 100%;
+	height: 90px;
+	top: 5px;
+	text-align: center;
+	font-size: 75px;
+	font-weight: bold;
+}
+
+.mainButtonBack {
+	width: 395px;
+	height: 100px;
+	top:650px;
+	background: rgba(0, 0, 0, 0.3);
+	box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.4);
+}
+
+.scenarioCard {
+	background: rgba(255, 255, 255, 0.6);
+	box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.6);
+	overflow: hidden;
+}
+
+#scenarioNextTag {
+	-ms-transform: rotate(-45deg);
+	-webkit-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+}
+
+.scenarioMenu {
+	width: 100%;
+	height: 80px;
+}
+
+.scenarioMenuText {
+	width: 100%;
+	height: 70px;
+	top: 5px;
+	font-size: 60px;
+}
+
+#scenarioPanel {
+	font-family: "RobotoCondensed", "sans-serif";
+}
+
+.clippingPlane {
+	width: 100%;
+	background: rgba(0,0,0,0.3);
+}
+
+.shadowDesign {
+	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.shadowDesignText {
+	text-shadow: 0px 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+</style>
+
+</head>
+
+<body onload = "screenManager(); loadEngine();" oncontextmenu = "return false" ondragstart = "return false" onselectstart = "return false">
+
+	<DIV id = "backPanel" class = "backPanelTexture">
+		<div id = "backGamePanel">
+			<div id = "scenarioMenuBack" style = "width: 100%; height: 100%; display: none;">
+                <div class = "backPanelTexture" style = "width: 100%; height: 100%; z-index: 100; opacity: 0.65;"></div>
+                <div style="width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.1); backdrop-filter: blur(15px); z-index: 99;"></div>
+            </div>
+		</div>
+		<div id = "gradient1" class = "clippingPlane" style = "top: 0px; left: 0px;"></div>
+		<div id = "gradient2" class = "clippingPlane" style = "bottom: 0px; right: 0px;"></div>
+	</DIV>
+
+	<DIV id = "gamePanel">
+
+		<div id = "scenarioMixPanel" style = "width: 600px; height: 410px; left: 340px; top: 285px; display: none; text-align: center;">
+			<div class = "shadowDesign" style = "width: 100%; height: 320px; border-radius: 20px;"></div>
+			<div class = "scenarioMenu" onclick = "loadScenario(0);" style = "top: 0px; background: rgba(0, 0, 0, 0.6); border-top-left-radius: 20px; border-top-right-radius: 20px;">
+				<div class = "scenarioMenuText">High Noon</div>
+			</div>
+			<div class = "scenarioMenu" onclick = "loadScenario(1);" style = "top: 80px; background: rgba(0, 0, 0, 0.4);">
+				<div class = "scenarioMenuText">A Fistful of Cards</div>
+			</div>
+			<div class = "scenarioMenu" onclick = "loadScenario(2);" style = "top: 160px; background: rgba(0, 0, 0, 0.6);">
+				<div class = "scenarioMenuText">Wild West Show</div>
+			</div>
+			<div class = "scenarioMenu" onclick = "loadScenario(3);" style = "top: 240px; background: rgba(0, 0, 0, 0.4); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+				<div class = "scenarioMenuText">Mixed</div>
+			</div>
+			<div onclick = "screenSwap(0);" class = "shadowDesign" style = "width: 100%; height: 80px; top: 330px; background: rgba(0, 0, 0, 0.2); border-radius: 20px;">
+				<div style = "width: 100%; height: 70px; top: 2px; font-size: 60px; font-weight: bold;">Back</div>
+			</div>
+		</div>
+
+		<div id = "scenarioMenuPanel" style = "width: 600px; height: 330px; left: 340px; top: 325px; display: none; z-index: 101; text-align: center;">
+			<div class = "shadowDesign" style = "width: 100%; height: 240px; border-radius: 20px;"></div>
+			<div class = "scenarioMenu" onclick = "" style = "top: 0px; background: rgba(0, 0, 0, 0.6); border-top-left-radius: 20px; border-top-right-radius: 20px; opacity: 0.2;">
+				<div class = "scenarioMenuText">View Character Cards</div>
+			</div>
+			<div class = "scenarioMenu" onclick = "screenSwap(3);" style = "top: 80px; background: rgba(0, 0, 0, 0.4);">
+				<div class = "scenarioMenuText">New Game</div>
+			</div>
+			<div class = "scenarioMenu" onclick = "screenSwap(0);" style = "top: 160px; background: rgba(0, 0, 0, 0.6); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+				<div class = "scenarioMenuText">Return to Menu</div>
+			</div>
+			<div class = "shadowDesign" onclick = "screenSwap(2);" style = "width: 100%; height: 80px; top: 250px; background: rgba(0, 0, 0, 0.2); border-radius: 20px;">
+				<div style = "width: 100%; height: 70px; top: 2px; font-size: 60px; font-weight: bold;">Close</div>
+			</div>
+		</div>
+
+		<div id = "scenarioPanel" style = "width: 100%; height: 100%; display: none;">
+			<div id = "scenarioPre" class = "scenarioCard">
+				<div id = "scenarioNextTag" style = "width: 200px; height: 200px; left: -100px; top: -100px; background: rgba(0, 0, 0, 0.5);">
+					<div style = "width: 100%; height: 50px; bottom: 10px; font-size: 50px; text-align: center; font-weight: bold;">Next</div>
+				</div>
+			</div>
+			<div id = "scenarioMain" class = "scenarioCard"></div>
+			<div class = "shadowDesignText" id = "scenarioName" style = "font-size: 90px; text-align: center; font-weight: bold;"></div>
+			<div style = "width: 200px; top: 240px; right: 10px; text-align: center;">
+				<div class = "shadowDesign" style = "width: 150px; height: 240px; left: 25px; border-radius: 20px;"></div>
+				<div style = "width: 150px; height: 120px; left: 25px; background: rgba(0,0,0,0.4); border-top-left-radius: 20px; border-top-right-radius: 20px;"></div>
+				<div style = "width: 150px; height: 120px; left: 25px; top: 120px; background: rgba(0,0,0,0.2); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;"></div>
+				<div style = "width: 100%; height: 30px; top: 13px; font-size: 35px; font-weight: bold;">Current</div>
+				<div style = "width: 100%; height: 50px; top: 43px; font-size: 60px; font-weight: bold;">Card</div>
+				<div id = "currText" style = "width: 100%; height: 75px; top: 130px; font-size: 75px;"></div>
+
+
+				<div class = "shadowDesign" onclick = "nextScenario(1);" style = "width: 150px; height: 120px; left: 25px; top: 260px; background: rgba(0,0,0,0.5); border-top-left-radius: 20px; border-top-right-radius: 20px;">
+					<div style = "width: 100%; height: 65px; top: 22px; font-size: 65px;">Next</div>
+				</div>
+				<div class = "shadowDesign" onclick = "nextScenario(-1);" style = "width: 150px; height: 120px; left: 25px; top: 390px; background: rgba(0,0,0,0.5); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+					<div style = "width: 100%; height: 65px; top: 22px; font-size: 65px;">Prev</div>
+				</div>
+
+				<div class = "shadowDesign" onclick = "screenSwap(4);" style = "width: 150px; height: 100px; left: 25px; top: 530px; background: rgba(0,0,0,0.2); border-radius: 20px;">
+					<div style = "width: 100%; height: 65px; top: 17px; font-size: 55px; font-weight: bold;">Menu</div>
+				</div>
+			</div>
+			<div id = "gameBar"></div>
+		</div>
+
+		<div id = "mainPanel" style = "width: 800px; height: 800px; left: 240px; top: 80px; display: none;">
+			<div id = "mainLogo"></div>
+			<div class = "mainButtonBack" style = "left: 0px; border-top-left-radius: 15px; border-bottom-left-radius: 15px;"></div>
+			<div class = "mainButtonBack" style = "right: 0px; border-top-right-radius: 15px; border-bottom-right-radius: 15px;"></div>
+			<div id = "startButton" class = "mainButton" onclick  = "screenSwap(-1);" style = "left: 0px;"><div id = "startButtonText" class = "mainButtonText">Start</div></div>
+			<div id = "creditButton" class = "mainButton" onclick = "screenSwap(1);" style = "left: 400px;"><div class = "mainButtonText">Credits</div></div>
+		</div>
+
+		<div id = "creditPanel" style = "width: 600px; height: 460px; left: 340px; top: 250px; display: none;">
+			<div class = "shadowDesign" style = "width: 100%; height: 340px; background: rgba(0,0,0,0.5); border-radius: 20px;"></div>
+			<div style = "width: 100%; height: 300px; left: 48px; top: 55px; font-size: 38px; line-height: 150%;">
+				Developed by <b>C.H.Park</b><br/>
+				Special Thanks to <b>TonyWild</b><br/>
+				Based on the original works of<br/><b>Emiliano Sciarra</b>
+			</div>
+			<a href = "changelog.html"><div id = "versionText" style = "width: 300px; top: 10px; right: 15px; font-size: 25px; text-align: right;"></div></a>
+
+			<div class = "shadowDesign" style = "width: 100%; height: 100px; top:360px; background: rgba(0,0,0,0.2); border-radius: 20px;"></div>
+			<div onclick = "screenSwap(0);" style = "width: 100%; height: 80px; top: 365px; font-size: 75px; text-align: center; font-weight:bold;">Back</div>
+		</div>
+
+	</DIV>
+
+</body>
+
+</HTML>
