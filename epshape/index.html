@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_1213" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0212" />
     <script src="./resources/lib/three.js"></script>
     <script src="./resources/lib/LineMaterial.js"></script>
     <script src="./resources/lib/LineSegmentsGeometry.js"></script>
@@ -35,7 +35,7 @@
     <script src="./resources/lib/iddLibrary.js"></script>
     <script src="./resources/lib/exampleIDF.js"></script>
     <!-- <script src="./resources/scripts.js?v=24_1015" defer></script> -->
-    <script src="./resources/scripts-compiled.js?v=24_1213" defer></script>
+    <script src="./resources/scripts-compiled.js?v=25_0212" defer></script>
 </head>
 
 <body>
@@ -88,6 +88,9 @@
                             </label>
                             <label style="padding-right: 10px;">
                                 <input id="SttgsMatTrans" type="checkbox" onclick="turnOnTransparentMat(this.checked);" checked /> Transparent materials
+                            </label>
+                            <label style="padding-right: 10px;">
+                                <input id="SttgsOverrideMat" type="checkbox" onclick="overrideMaterials(this.checked);" /> Override materials
                             </label>
                             <span class="settingsFlexSpan">
                                 <span style="width:19px; flex:none; text-align:center; font-size:8px; line-height:8px; opacity:0.7;">⬤</span>
@@ -183,6 +186,7 @@
                             <ul>
                                 <li><b>camerafar + (num) : </b>Set camera frustum far plane to (num).</li>
                                 <li><b>maxzoom + (num) : </b>Set max camera zoom distance to (num).</li>
+                                <li><b>camerafov + (num) : </b>Set camera fov to (num)°.</li>
                             </ul>
                         </div>
                         <div class="settingsPanelBlock">
@@ -214,6 +218,7 @@
                     
                             <label><input type="checkbox" data-tag="sh" checked> Shading visibility</label>
                             <label><input type="checkbox" data-tag="mt" checked> Material transparency</label>
+                            <label><input type="checkbox" data-tag="om" checked> Override materials</label>
                             <label><input type="checkbox" data-tag="wo" checked> Window opacity</label>
                             <label><input type="checkbox" data-tag="et" checked> Edge thickness</label>
                             <label><input type="checkbox" data-tag="st" checked> Shadow toggle</label>
@@ -247,7 +252,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-12-13</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-02-12</a></b>
                 </small></p>
             </div>
 
