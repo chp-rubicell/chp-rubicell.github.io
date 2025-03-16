@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0212" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0317" />
     <script src="./resources/lib/three.js"></script>
     <script src="./resources/lib/LineMaterial.js"></script>
     <script src="./resources/lib/LineSegmentsGeometry.js"></script>
@@ -34,8 +34,8 @@
     <script src="./resources/lib/earcut.js"></script>
     <script src="./resources/lib/iddLibrary.js"></script>
     <script src="./resources/lib/exampleIDF.js"></script>
-    <!-- <script src="./resources/scripts.js?v=24_1015" defer></script> -->
-    <script src="./resources/scripts-compiled.js?v=25_0212" defer></script>
+    <!-- <script src="./resources/scripts.js" defer></script> -->
+    <script src="./resources/scripts-compiled.js?v=25_0317" defer></script>
 </head>
 
 <body>
@@ -243,7 +243,8 @@
                     <button class="solidPanelButton" onclick="copySettings();">Copy</button>
                 </div>
 
-                <div id="CommandListener" class="glass"></div>
+                <!-- <div id="CommandListener" class="glass"></div> -->
+                <input id="CommandListener" class="glass" type="text" placeholder="help" onkeyup="runCommandInput(event, this);" onfocusout="commandListenerVisibility(0);" />
 
             </div>
 
@@ -252,7 +253,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-02-12</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-03-17</a></b>
                 </small></p>
             </div>
 
