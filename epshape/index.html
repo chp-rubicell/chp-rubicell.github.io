@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0317" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0404" />
     <script src="./resources/lib/three.js"></script>
     <script src="./resources/lib/LineMaterial.js"></script>
     <script src="./resources/lib/LineSegmentsGeometry.js"></script>
@@ -36,7 +36,7 @@
     <script src="./resources/lib/exampleIDF.js"></script>
     <script src="./resources/lib/jszip.min.js"></script>
     <!-- <script src="./resources/scripts.js" defer></script> -->
-    <script src="./resources/scripts-compiled.js?v=25_0320" defer></script>
+    <script src="./resources/scripts-compiled.js?v=25_0404" defer></script>
 </head>
 
 <body>
@@ -73,7 +73,61 @@
                 </div>
                 <div class="hoverBtnWrapper" style="right: 40px;">
                     <button id="SaveBtn" class="hoverBtn glass" onclick="exportImage();"></button>
+                    <button id="VisibilityBtn" class="hoverBtn glass" onclick="panelVisibility(visibilityPanel, 1); hoverBtnVisibility(-1);"></button>
                     <button id="SettingsBtn" class="hoverBtn glass" onclick="settingsPanelVisibility(1);"></button>
+                </div>
+
+                <div id="VisibilityPanel" class="glass defaultPanel" style="width: 350px;">
+                    <div class="panelTitle">Visibility</div>
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1); hoverBtnVisibility(1);"></div>
+
+                    <div class="panelContent">
+                        <div id="SettingsPanelBlockVisFilter" class="settingsPanelBlock">
+                            <h5>Filter by</h5>
+                            <center>
+                                <button class="settingsPanelButton changeBackgroundColorBtn changeBgColorBtnHighlighted" onclick="changeVisFilter('zones', this);" disabled>Zones</button>
+                                <button class="settingsPanelButton changeBackgroundColorBtn" onclick="changeVisFilter('height', this);">Height</button>
+                            </center>
+                        </div>
+
+                        <div id="VisByZones" class="settingsPanelBlock" style="margin-bottom: 0;">
+                            <h5>Zones</h5>
+                    
+                            <center>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(true);">Select all</button>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(false);">Deselect all</button>
+                            </center>
+
+                            <div id="SettingsPanelBlockZones" style="width:100%">
+                            </div>
+                        </div>
+
+                        <div id="VisByHeight" class="settingsPanelBlock" style="display: none;">
+                            <h5>Height Range</h5>
+                    
+                            <center>
+                                <button class="settingsPanelButton" onclick="resetSliderValue();">Reset</button>
+                            </center>
+                            
+                            <div class="RangeSliderContainer">
+                                <div class="SlidersControl">
+                                    <div id="SliderBackground"></div>
+                                    <input id="fromSlider" tabindex="-1" type="range" value="10" min="0" max="100" step="0.01" />
+                                    <input id="toSlider" tabindex="-1" type="range" value="30" min="0" max="100" step="0.01" />
+                                </div>
+                                <div class="FormControl">
+                                    <div>
+                                        <div style="text-align: center;">Min</div>
+                                        <input class="settingsInput" type="number" id="fromInput" value="10" min="0" max="100" />
+                                    </div>
+                                    <div>
+                                        <div style="text-align: center;">Max</div>
+                                        <input class="settingsInput" type="number" id="toInput" value="30" min="0" max="100" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="SettingsPanel" class="glass defaultPanel" style="width: 350px;">
@@ -111,7 +165,7 @@
                     
                         </div>
 
-                        <div class="settingsPanelBlock">
+                        <div id="SettingsPanelBlockBackground" class="settingsPanelBlock">
                             <h5>Background</h5>
                     
                             <center>
@@ -119,18 +173,6 @@
                                 <button class="settingsPanelButton changeBackgroundColorBtn changeBgColorBtnHighlighted" onclick="changeBackgroundColor(1, this);" disabled>White</button>
                                 <button class="settingsPanelButton changeBackgroundColorBtn" onclick="changeBackgroundColor(-1, this);">Transparent</button>
                             </center>
-                        </div>
-
-                        <div class="settingsPanelBlock">
-                            <h5>Zone Visibility</h5>
-                    
-                            <center>
-                                <button class="settingsPanelButton" onclick="changeZoneAll(true);">Select all</button>
-                                <button class="settingsPanelButton" onclick="changeZoneAll(false);">Deselect all</button>
-                            </center>
-
-                            <div id="SettingsPanelBlockZones" style="width:100%">
-                            </div>
                         </div>
 
                     </div>
@@ -255,7 +297,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-03-20</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-04-04</a></b>
                 </small></p>
             </div>
 
@@ -416,9 +458,10 @@
         }
 
         const commandPanel = document.getElementById('CommandPanel');
+        const visibilityPanel = document.getElementById('VisibilityPanel');
         const helpPanel = document.getElementById('HelpPanel');
         const copyPanel = document.getElementById('CopyPanel');
-        const panels = [commandPanel, helpPanel, copyPanel];
+        const panels = [commandPanel, visibilityPanel, helpPanel, copyPanel];
 
         panelVisibilityAll(-1);
         

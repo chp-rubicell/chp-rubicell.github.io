@@ -4,6 +4,10 @@ rgb(223, 238, 245), # dfeef5
 rgb(240, 245, 247), # f0f5f7
 */
 
+:root {
+    --slider-handle-size: 15px;
+}
+
 
 .bg {
     position: absolute;
@@ -254,12 +258,14 @@ span {
 button.glass:hover {
     background-color: rgba(240,245,247,0.8);
     /* box-shadow: 0 10px 20px 0px rgba(0,0,0,0.3); */
-    box-shadow: 0 0 5px 2px rgba(240,245,247,0.3);
+    /* box-shadow: 0 0 5px 2px rgba(240,245,247,0.3); */
+    box-shadow: 0 5px 10px 2px rgba(0,0,0,0.3);
 }
 button.glass:active, .customButton:focus {
     background-color: rgba(158,227,255,0.8);
     /* transition-duration: 0s; */
-    box-shadow: 0 0 5px 2px rgba(158,227,255,0.3);
+    /* box-shadow: 0 0 5px 2px rgba(158,227,255,0.3); */
+    box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.3);
 }
 
 .defaultPanel {
@@ -317,9 +323,20 @@ button.glass:active, .customButton:focus {
     background-position: center center;
     background-repeat: no-repeat;
 }
-#SaveBtn {
+#VisibilityBtn {
     top: 0px;
     right: 40px;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    background-image: url('./imgs/vis.png');
+    background-size: 22px 22px;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+#SaveBtn {
+    top: 0px;
+    right: 80px;
     width: 30px;
     height: 30px;
     border-radius: 100%;
@@ -496,6 +513,7 @@ button.glass:active, .customButton:focus {
     margin-block-end: 0.8em;
     margin-left: 2.5px;
     margin-right: 2.5px;
+    transition: background-color 0.5s, color 0.5s;
 }
 .settingsPanelButton:enabled:hover {
     background-color: #112C4420;
@@ -521,15 +539,20 @@ button.glass:active, .customButton:focus {
     /* border: 2px solid #112C4460; */
     padding: 6px 30px 6px;
     border-radius: 30px;
+    transition: box-shadow 0.5s, text-shadow 0.5s, background-color 0.5s, color 0.5s;
 }
 .solidPanelButton:enabled:hover {
     border: 0px;
     background-color: #112C4460;
+    box-shadow: inset 0 5px 10px 2px rgba(0,0,0,0.3);
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 .solidPanelButton:enabled:active {
     border: 0px;
     background-color: #112C44;
     color: rgba(240,245,247,0.7);
+    box-shadow: inset 0 8px 12px 2px rgba(0,0,0,0.3);
+    text-shadow: 0 5px 8px rgba(0,0,0,0.3);
 }
 
 .settingsFlexSpan {
@@ -557,6 +580,7 @@ button.glass:active, .customButton:focus {
     margin-left: auto;
     min-width: 25px;
     flex: none;
+    transition: background-color 0.5s, color 0.5s;
 }
 .settingsInput:disabled {
     outline: 2px dashed #112C4460;
@@ -678,4 +702,93 @@ input[type=number] {
 }
 #objectDisplay.transparentmode b {
     color: #9EE3FFCC;
+}
+
+/*+ -------------------------------------------------------------- +*/
+
+.RangeSliderContainer {
+    display: flex;
+    flex-direction: column;
+    margin: 10px auto;
+}
+
+.SlidersControl {
+    position: relative;
+    min-height: 10px;
+    margin-bottom: 5px;
+}
+
+.FormControl {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+#SliderBackground, input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    position: absolute;
+    background: none;
+    pointer-events: none;
+    margin: 0;
+}
+#SliderBackground {
+    height: 3px;
+    width: calc(100% - var(--slider-handle-size)*2);
+    margin: 0 var(--slider-handle-size);
+    transform: translate(0, -50%);
+}
+input[type="range"] {
+    height: 0px;
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: all;
+    width: var(--slider-handle-size);
+    height: var(--slider-handle-size);
+    /* border: 3px solid #112C44; */
+    /* background-color: none; */
+    background-color: #112C44;
+    /* background-color: #112C44a0; */
+    border-radius: 50%;
+    cursor: pointer;
+}
+input[type=range]::-moz-range-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: all;
+    width: var(--slider-handle-size);
+    height: var(--slider-handle-size);
+    background-color: #112C44;
+    border-radius: 50%;
+    cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+    background-color: rgba(158,227,255);
+    box-shadow: 0 1px 5px 2px rgba(158,227,255,0.6);
+}
+input[type=range]::-webkit-slider-thumb:active {
+    box-shadow: 0 1px 5px 2px rgba(158,227,255,0.6), 0 3px 6px 1px rgba(0,0,0,0.3);
+}
+
+.FormControl input[type="number"] {
+    height: 20px;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    opacity: 1;
+}
+
+#fromSlider {
+    z-index: 1;
+}
+#toSlider {
+    z-index: 0;
+}
+#toSlider:hover {
+    z-index: 2;
 }
