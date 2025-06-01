@@ -450,6 +450,10 @@ button.glass:active, .customButton:focus {
 .settingsPanelBlock:last-child {
     margin-bottom: 0;
 }
+.settingsPanelBlock > span, .settingsPanelBlock > label  {
+    padding-top: 0.1ex;
+    padding-bottom: 0.1ex;
+}
 .settingsPanelBlock label {
     width: 100%;
     display: block;
@@ -593,6 +597,14 @@ button.glass:active, .customButton:focus {
     background-color: #112C4460;
     color: rgba(240,245,247,0.7);
 }
+select.settingsInput {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100px;
+    /* font-weight: normal;
+    font-size: 0.8em; */
+}
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -643,7 +655,8 @@ input[type=number] {
     left: 50%;
     width: 500px;
     /* width: fit-content; */
-    height: 25px;
+    /* height: 25px; */
+    height: 35px;
     margin-top: -17.5px;
     margin-left: -265px;
     /* margin-left: auto; */
@@ -653,6 +666,12 @@ input[type=number] {
     font-size: 16px;
     font-family: 'Roboto Mono', monospace;
     font-weight: bold;
+    background-color: rgba(0,0,0,0.5);
+    /* background-color: #112C4450; */
+    color: rgba(158,227,255,0.8);
+    /* backdrop-filter: blur(15px); */
+    /* box-shadow: inset 0 8px 12px 2px rgba(0,0,0,0.3); */
+    box-shadow: inset 0 4px 10px rgba(0,0,0,0.1), 0 8px 20px 2px rgba(0,0,0,0.5);
 }
 .CommandSuccess {
     background-color: rgba(7, 220, 78, 0.33);

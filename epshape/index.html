@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0404" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0601" />
     <script src="./resources/lib/three.js"></script>
     <script src="./resources/lib/LineMaterial.js"></script>
     <script src="./resources/lib/LineSegmentsGeometry.js"></script>
@@ -36,7 +36,7 @@
     <script src="./resources/lib/exampleIDF.js"></script>
     <script src="./resources/lib/jszip.min.js"></script>
     <!-- <script src="./resources/scripts.js" defer></script> -->
-    <script src="./resources/scripts-compiled.js?v=25_0404A" defer></script>
+    <script src="./resources/scripts-compiled.js?v=25_0601" defer></script>
 </head>
 
 <body>
@@ -69,12 +69,12 @@
                 
 
                 <div class="hoverBtnWrapper" style="right: 0px;">
-                    <button id="HelpBtn" class="hoverBtn glass" onclick="panelVisibility(helpPanel, 1); hoverBtnVisibility(-1);"></button>
+                    <button id="HelpBtn" class="hoverBtn glass" title="Help" onclick="panelVisibility(helpPanel, 1); hoverBtnVisibility(-1);"></button>
                 </div>
                 <div class="hoverBtnWrapper" style="right: 40px;">
-                    <button id="SaveBtn" class="hoverBtn glass" onclick="exportImage();"></button>
-                    <button id="VisibilityBtn" class="hoverBtn glass" onclick="panelVisibility(visibilityPanel, 1); hoverBtnVisibility(-1);"></button>
-                    <button id="SettingsBtn" class="hoverBtn glass" onclick="settingsPanelVisibility(1);"></button>
+                    <button id="SaveBtn" class="hoverBtn glass" title="Save as Image" onclick="exportImage();"></button>
+                    <button id="VisibilityBtn" class="hoverBtn glass" title="Visibility" onclick="panelVisibility(visibilityPanel, 1); hoverBtnVisibility(-1);"></button>
+                    <button id="SettingsBtn" class="hoverBtn glass" title="Settings" onclick="settingsPanelVisibility(1);"></button>
                 </div>
 
                 <div id="VisibilityPanel" data-panel-tag="visibility" class="glass defaultPanel" style="width: 350px;">
@@ -94,8 +94,8 @@
                             <h5>Zones</h5>
                     
                             <center>
-                                <button class="settingsPanelButton" onclick="changeZoneAll(true);">Select all</button>
-                                <button class="settingsPanelButton" onclick="changeZoneAll(false);">Deselect all</button>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(true);">Show all</button>
+                                <button class="settingsPanelButton" onclick="changeZoneAll(false);">Hide all</button>
                             </center>
 
                             <div id="SettingsPanelBlockZones" style="width:100%">
@@ -155,6 +155,15 @@
                             <span class="settingsFlexSpan">
                                 <label style="padding-right: 10px;"><input id="SttgsLineThkCheckbox" type="checkbox" onclick="turnOnLineThickness(this.checked);"> Edge thickness :</label>
                                 <input id="SttgsLineThkInputfield" class="settingsInput" type="text" value="-" placeholder="1" step="any" onkeyup="updateLineThicknessInputfield(event, this);" onfocusout="updateLineThicknessInputfield(undefined, this);" disabled />
+                            </span>
+                            <span class="settingsFlexSpan">
+                                <span style="width:19px; flex:none; text-align:center; font-size:8px; line-height:8px; opacity:0.7;">⬤</span>
+                                <span style="flex:none;">&nbsp;Hidden objects :&nbsp;</span>
+                                <select id="SttgsHiddenMatType" class="settingsInput" onchange="changeHiddenMatType(this.value);">
+                                    <option value="disable">disable</option>
+                                    <option value="wireframe">wireframe</option>
+                                    <option value="ghost" selected="selected">ghost</option>
+                                </select>
                             </span>
                             <label style="padding-right: 10px;">
                                 <input id="SttgsShadow" type="checkbox" onclick="turnOnShadow(this.checked);" /> Shadow</font>
@@ -266,6 +275,7 @@
                             <label><input type="checkbox" data-tag="om" checked> Override materials</label>
                             <label><input type="checkbox" data-tag="wo" checked> Window opacity</label>
                             <label><input type="checkbox" data-tag="et" checked> Edge thickness</label>
+                            <label><input type="checkbox" data-tag="hm" checked> Hidden objects material</label>
                             <label><input type="checkbox" data-tag="st" checked> Shadow toggle</label>
                             <label><input type="checkbox" data-tag="ss" checked> Shadow settings</label>
                             <label><input type="checkbox" data-tag="dg" checked> Debug</label>
@@ -298,7 +308,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-04-04</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-06-01</a></b>
                 </small></p>
             </div>
 
