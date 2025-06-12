@@ -7,6 +7,20 @@ rgb(240, 245, 247), # f0f5f7
 :root {
     --slider-handle-size: 15px;
 }
+.lg-title {
+    display: inline-block;
+}
+.sm-title {
+    display: none;
+}
+@media screen and (max-width: 650px) {
+    .lg-title {
+        display: none;
+    }
+    .sm-title {
+        display: inline-block;
+    }
+}
 
 
 .bg {
@@ -67,11 +81,25 @@ h2, h3, h4 {
     text-align: center;
 }
 h2 {
-    font-size: 2em;
+    font-size: 1.8em;
     margin-block-end: 0.0em;
+    white-space: nowrap;
 }
-h3 {
-    margin-block-start: 0.6em;
+#logo {
+    /* display: none; */
+    height: 35px;
+    /* color: #f0f5f770; */
+    color: rgba(158,227,255,0.8);
+    /* margin-right: 5px; */
+}
+#logoSigniture {
+    height: 35px;
+    color: #f0f5f7a0;
+    /* color: rgba(158,227,255,0.8); */
+    /* margin: 0 8px; */
+    /* margin-right: 10px; */
+    margin-left: 3px;
+    margin-right: 8px;
 }
 h4 {
     font-weight: normal;
