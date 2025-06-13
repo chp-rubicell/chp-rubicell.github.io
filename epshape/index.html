@@ -25,7 +25,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0612" />
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=25_0614" />
     <script src="./resources/lib/three.js"></script>
     <script src="./resources/lib/LineMaterial.js"></script>
     <script src="./resources/lib/LineSegmentsGeometry.js"></script>
@@ -37,7 +37,7 @@
     <script src="./resources/lib/exampleIDF.js"></script>
     <script src="./resources/lib/jszip.min.js"></script>
     <!-- <script src="./resources/scripts.js" defer></script> -->
-    <script src="./resources/scripts-compiled.js?v=25_0612" defer></script>
+    <script src="./resources/scripts-compiled.js?v=25_0614" defer></script>
 </head>
 
 <body>
@@ -95,6 +95,7 @@
                             <center>
                                 <button data-type="zones" class="settingsPanelButton changeBackgroundColorBtn changeBgColorBtnHighlighted" onclick="changeVisFilter(this.dataset.type);" disabled>Zones</button>
                                 <button data-type="height" class="settingsPanelButton changeBackgroundColorBtn" onclick="changeVisFilter(this.dataset.type);">Height</button>
+                                <button data-type="both" class="settingsPanelButton changeBackgroundColorBtn" onclick="changeVisFilter(this.dataset.type);">Both</button>
                             </center>
                         </div>
 
@@ -231,34 +232,35 @@
 
                 <div id="CommandPanel" data-panel-tag="command" class="glass defaultPanel" style="width: 500px;">
                     <div class="panelTitle">Commands</div>
-                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1);"></div>
+                    <div class="settingsCloseBtn" onclick="panelVisibility(this.parentElement, -1); hoverBtnVisibility(1);"></div>
 
                     <div class="panelContent">
                         <div class="settingsPanelBlock">
                             <h5>Basics</h5>
                             <ul>
-                                <li><b>help : </b>See the list of commands.</li>
-                                <li><b>↑ : </b>Insert last command.</li>
+                                <li><code>help</code><span>See the list of commands.</span></li>
+                                <li><code>↑</code><span>Insert last command.</span></li>
                             </ul>
                         </div>
                         <div class="settingsPanelBlock">
                             <h5>Camera</h5>
                             <ul>
-                                <li><b>camerafar + (num) : </b>Set camera frustum far plane to (num).</li>
-                                <li><b>maxzoom + (num) : </b>Set max camera zoom distance to (num).</li>
-                                <li><b>camerafov + (num) : </b>Set camera fov to (num)°.</li>
-                                <li><b>animatecamera + (num)(cw/ccw) : </b>Export (num) animated frames of the camera rotating in (cw/ccw) direction.</li>
+                                <li><code>camerafar (num)</code><span>Set camera frustum far plane to (num).</span></li>
+                                <li><code>maxzoom (num)</code><span>Set max camera zoom distance to (num).</span></li>
+                                <li><code>camerafov (num)</code><span>Set camera fov to (num)°.</span></li>
+                                <li><code>animatecamera (num)(cw/ccw)</code><span>Export (num) animated frames of the camera rotating in (cw/ccw) direction.</span></li>
+                                <li><code>animateheight (num)(up/dn)</code><span>Export (num) animated frames of the building slice from bottom to up (up) or top to bottom (dn).</span></li>
                             </ul>
                         </div>
                         <div class="settingsPanelBlock">
                             <h5>Shadows</h5>
                             <ul>
-                                <li><b>shadowalt + (num) : </b>Set shadow altitude to (num)°.</li>
-                                <li><b>shadowazm + (num) : </b>Set shadow azimuth to (num)°.</li>
-                                <li><b>shadowmapsize + (num) : </b>Set shadow map resolution to (num)×(num).</li>
-                                <li><b>shadowradius + (num) : </b>Set shadow blur to (num)×(num).</li>
-                                <li><b>shadowheight + (num) : </b>Set shadow plane height to (num)m.</li>
-                                <li><b>selfshadow + (on/off) : </b>Toggle self shadow.</li>
+                                <li><code>shadowalt (num)</code><span>Set shadow altitude to (num)°.</span></li>
+                                <li><code>shadowazm (num)</code><span>Set shadow azimuth to (num)°.</span></li>
+                                <li><code>shadowmapsize (num)</code><span>Set shadow map resolution to (num)×(num).</span></li>
+                                <li><code>shadowradius (num)</code><span>Set shadow blur to (num)×(num).</span></li>
+                                <li><code>shadowheight (num)</code><span>Set shadow plane height to (num)m.</span></li>
+                                <li><code>selfshadow (on/off)</code><span>Toggle self shadow.</span></li>
                             </ul>
                         </div>
                     </div>
@@ -316,7 +318,7 @@
                 <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
                 <p><small>
                     <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
-                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-06-06</a></b>
+                    UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2025-06-14</a></b>
                 </small></p>
             </div>
 

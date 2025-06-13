@@ -531,6 +531,33 @@ button.glass:active, .customButton:focus {
     padding-bottom: 1ex;
     line-height: 1.1;
 }
+.settingsPanelBlock li code {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: bold;
+    background-color: #26272C;
+    color: rgba(240,245,247);
+    /* display: inline-block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; */
+    padding: 0.1em 0.8em;
+    border-radius: 20px;
+    line-height: 2;
+    font-size: 0.85em;
+    vertical-align: middle;
+    text-indent: -0.5em;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+#CommandPanel li {
+    line-height: 1.2;
+    padding-left: 0.5em;
+    text-indent: 0em;
+    vertical-align: middle;
+}
+#CommandPanel li span {
+    /* display: inline; */
+    margin-left: 0.5em;
+}
 
 .settingsPanelButton {
     font-family: 'Roboto', sans-serif;
@@ -694,12 +721,16 @@ input[type=number] {
     font-size: 16px;
     font-family: 'Roboto Mono', monospace;
     font-weight: bold;
-    background-color: rgba(0,0,0,0.5);
-    /* background-color: #112C4450; */
+    /* background-color: rgba(0,0,0,0.5); */
+    background-color: #112C4480;
+    /* background-color: white; */
     color: rgba(158,227,255,0.8);
     /* backdrop-filter: blur(15px); */
     /* box-shadow: inset 0 8px 12px 2px rgba(0,0,0,0.3); */
-    box-shadow: inset 0 4px 10px rgba(0,0,0,0.1), 0 8px 20px 2px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 20px 2px rgba(0,0,0,0.5);
+    /* box-shadow: inset 0 4px 10px rgba(0,0,0,0.1), 0 8px 20px 2px rgba(0,0,0,0.5); */
+    /* box-shadow: inset 0 8px 12px 2px rgba(0,0,0,0.3); */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 .CommandSuccess {
     background-color: rgba(7, 220, 78, 0.33);
@@ -729,6 +760,7 @@ input[type=number] {
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
     text-align: left;
+    pointer-events: none;
 }
 #objectDisplay.whitemode {
     color: black;
@@ -783,9 +815,12 @@ input[type=number] {
 }
 #SliderBackground {
     height: 3px;
-    width: calc(100% - var(--slider-handle-size)*2);
-    margin: 0 var(--slider-handle-size);
+    /* width: calc(100% - var(--slider-handle-size)*2);
+    margin: 0 var(--slider-handle-size); */
+    width: calc(100% - var(--slider-handle-size));
+    margin: 0 calc(var(--slider-handle-size) / 2);
     transform: translate(0, -50%);
+    box-sizing: border-box;
 }
 input[type="range"] {
     height: 0px;
