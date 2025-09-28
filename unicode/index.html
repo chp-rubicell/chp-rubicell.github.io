@@ -40,9 +40,10 @@
 
     <DIV id="PageWrapper">
         <label for="InputBefore">Before</label>
-        <input id="InputBefore">
+        <input id="InputBefore" onkeyup="updateText(event, this);">
+        <span id="InputPreview">TestTest</span>
         <label for="InputAfter">After</label>
-        <input id="InputAfter">
+        <input id="InputAfter" readonly>
     </DIV>
 
 </body>
