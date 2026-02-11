@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html colorTheme="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name='title' property='og:title' content='EP Simple Designer'/>
+    <meta name='author' content='Chul-Hong Park'>
+    <meta name='description' property='og:description' content='EnergyPlus Simple Designer developed by Chul-Hong Park'/>
+    <meta property='og:url' content='https://chp-rubicell.github.io/epdesign'/>
+    <meta name='image' property='og:image' content='https://chp-rubicell.github.io/epdesign/resources/img/thumbnail.jpg'/>
+    <meta name='twitter:image' content='https://chp-rubicell.github.io/epdesign/resources/img/thumbnail.jpg' />
+    <meta property='og:image:width' content='1200' />
+    <meta property='og:image:height' content='627' />
+    <meta property='og:type' content='website' />
+
+    <link rel="icon" href="resources/img/favicon.png">
+
+    <title>EP Simple Designer</title>
+
+    <link rel="stylesheet" type="text/css" href="resources/styles.css?v=24_0830" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;400;700&family=Roboto:ital,wght@0,100;0,400;0,700&family=Roboto+Condensed:ital,wght@0,100;0,400;0,700&display=swap" rel="stylesheet">
+
+    <script src="resources/libraries/three.js"></script>
+    <script src="resources/libraries/CSS2DRenderer.js"></script>
+    <script src="resources/libraries/earcut.js"></script>
+
+    <script>
+        const widthThreshold = 800;
+        const editorResolution = 1024;
+        const viewerResolution = 1024;
+
+        const dividerSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--dividerSize'));
+        const colorTheme = document.documentElement.getAttribute('colorTheme');
+    </script>
+</head>
+
+<body>
+
+    <!--* Header *-->
+    <div class="panel" id="header">
+        <h1>
+            <img height="40px" src="resources/img/eplogo.png" style="vertical-align: middle;"/>
+            EnergyPlus Simple Designer <span style="font-weight: normal; font-style: italic; color: rgba(158,227,255,0.8);">prototype</span>
+        </h1>
+    </div>
+    <div class="panel" style="width: min(100%, 500px);">
+        <br>
+        <div style="width: 100%; height: auto; text-align: right; display: none; margin-top: 10px; margin-bottom: 15px;">
+            <div id="fileSelectorTag"></div>
+            &nbsp;
+            <label id="fileSelectorBtn" class="customButton" for="fileSelector">.epsd file</label>
+            <input id="fileSelector" type="file" accept=".epse" style="display:none;">
+        </div>
+    </div>
+    
+    <!--* Main editor panel *-->
+    <div class="dividerContainer" id="mainPanel">
+        <div class="dividerPanel1 bordered" id="editorPanel">
+            <div class="canvasWrapper">
+                <canvas></canvas>
+                <div id="editorInput">
+                    <input id="editorInputField" type="text" tabindex="-1" oninput="checkInputValidity();" placeholder="" />
+                </div>
+            </div>
+            <div class="toolbar borderbottom" style="position: absolute; width: 100%; padding: 5px 10px; max-width: 100%; height: fit-content;">
+                <div class="toolbar" style="width: fit-content;">
+                    <div class="custom-select" style="width: 80px; flex: none;">
+                        <select id="floorSelector" onchange="changeFloor(this);" style="font-size: 20px;">
+                            <option value="add upper">add upper</option>
+                            <option value="1" selected="selected">1F</option>
+                            <option value="add lower">add lower</option>
+                        </select>
+                    </div>
+                    <span></span>
+                    <input type="checkbox" class="toggleButtonState" id="btnToggleDrawZone" value="1"/>
+                    <label class="toggleButton button2" onclick="Editor.state=0;" style="margin: 0 2px; flex: none; font-size: 20px;">add zone</label>
+                    <span></span>
+                </div>
+                <!-- <button class="button2" onclick="Editor.state=0;" style="margin: 0 2px;">draw wall</button> -->
+                <div class="toolbar" style="position: relative; flex: 1; height: 50px">
+                    <div id="toolgroupDrawZone" class="toolbar toolgroup">
+                        <div class="borderleft" style="height: 30px"></div>
+                        <span></span>
+                        <input type="checkbox" id="snapToObjects" onclick="Editor.snapToObjects=true;" checked />
+                        <label for="snapToObjects">snap</label>
+                        <span></span>
+                        <input type="checkbox" id="showLowerFloor" onclick="Editor.showLowerFloor=true;" checked />
+                        <label for="showLowerFloor">show lower floor</label>
+                        <span></span>
+                        <input type="checkbox" id="showUpperFloor" onclick="Editor.showUpperFloor=true;" />
+                        <label for="showUpperFloor">show upper floor</label>
+                    </div>
+                    <div id="toolgroupWallProp" class="toolbar toolgroup">
+                        <div class="borderleft" style="height: 30px"></div>
+                        <span></span>
+                        <span>
+                            <strong>Name: </strong>
+                        </span>
+                        <input data-property="wallName" type="text" value="wall name" style="width:120px;" disabled />
+                        <span>
+                            <span></span>
+                            <strong>Construction: </strong>
+                        </span>
+                        <input data-property="construction" type="text" value="Default Exterior Wall" style="width:200px;" disabled />
+                        <span>
+                            <span></span>
+                            <strong>WWR: </strong>
+                        </span>
+                        <input data-property="wwr" id="inputWallWWR" type="number" value="0.5" placeholder="0.5" onkeydown="updateWWR(event, this)" style="min-width: 55px; flex: initial;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divider"></div>
+        <div class="dividerPanel2 bordered" id="viewerPanel">
+            <div class="canvasWrapper">
+                <canvas></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!--* Footer *-->
+    <div class="panel" id="footer" style="padding-top: 15px;">
+        <div class="separator"></div>
+        <h4><small>DEVELOPED BY</small><b>&nbsp;&nbsp;Chul-Hong Park</b></h4>
+        <p><small>
+            <a href="https://chp-rubicell.github.io/" target="_blank" rel="noopener noreferrer">chp-rubicell.github.io</a><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b><a href="mailto:chulhong.park@snu.ac.kr">chulhong.park@snu.ac.kr</a><br>
+            UPDATED ON<b>&nbsp;&nbsp;<a style="text-decoration: none;" href="resources/updatelog.html">2024-08-30</a></b>
+        </small></p>
+    </div>
+
+    <!--* Scripts *-->
+    <script src="resources/libraries/utils.js?v=24_0830A"></script>
+    <script src="resources/libraries/shape.js?v=24_0830A"></script>
+    <!-- <script src="resources/compiled-scripts.js?v=24_0830A"></script> -->
+    <script src="resources/objects.js?v=24_0830A"></script>
+    <script src="resources/divider.js?v=24_0830"></script>
+    <script src="resources/editor.js?v=24_0830"></script>
+    <!-- <script src="resources/viewer.js?v=24_0830"></script> -->
+    <script src="resources/main.js?v=24_0830"></script>
+
+</body>
+
+</html>
