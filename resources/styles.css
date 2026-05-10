@@ -63,6 +63,12 @@
     background: linear-gradient(to bottom, #404146, #1B1C20);
 } */
 
+* {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
 html, body {
     position: absolute;
     margin: 0px;
@@ -121,19 +127,19 @@ hr {
     margin-block-start: 20px;
     margin-block-end: 20px;
 }
-a {
+a:not(.button1, .button2) {
     color: var(--linkColor);
     transition: color 0.5s;
 }
-a:visited {
+a:not(.button1, .button2):visited {
     color: var(--linkColor);
 }
 @media (hover: hover) and (pointer: fine) {
-    a:hover {
+    a:not(.button1, .button2):hover {
         color: var(--linkHoverColor);
     }
 }
-a:active {
+a:not(.button1, .button2):active {
     color: var(--linkHoverColor);
 }
 
@@ -190,7 +196,8 @@ a:active {
     flex-direction: row; */
     /* display: block !important; */
 }
-.SmallBtnGroup button {
+.SmallBtnGroup button,
+.SmallBtnGroup a {
     width: 40px;
     height: 35px;
     border-radius: 18px;
