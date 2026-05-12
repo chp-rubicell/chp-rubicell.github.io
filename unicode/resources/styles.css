@@ -10,7 +10,7 @@ body {
 h2 {
     font-size: 1.8em;
     margin-block-start: 0;
-    margin-block-end: 0.2em;
+    margin-block-end: 10px;
     white-space: nowrap;
 }
 
@@ -88,6 +88,11 @@ button:hover {
     white-space: normal;
 }
 
+.separator {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 .copyBtnGroup {
     position: absolute;
     right: 5px;
@@ -100,16 +105,11 @@ button:hover {
     /*opacity: 0;*/
     transition: inherit;
 }
-button:hover .copyBtnGroup,
-.copied .copyBtnGroup {
-    /*opacity: 100;*/
-}
 .copyBtn {
     transition: inherit;
     position: absolute;
     display: block;
 }
-
 .check-icon {
     opacity: 0;
 }
