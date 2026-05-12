@@ -1,0 +1,193 @@
+/* ───────────────────────────────────────────────── */
+/* Hyperparameters */
+
+:root[colorTheme='light'] {
+    --bg: #fff;
+    --textColor: #33444f;
+    --separatorColor: rgba(0,0,0,0.5);
+}
+:root[colorTheme='dark'] {
+    --bg: #292A2F url('./img/bg.jpg');
+    --textColor: #fff;
+    --keyColor: #9EE3FF;
+    --separatorColor: rgba(240,245,247,0.5);
+    /* button 1 */
+    --btn1Color: rgba(255,255,255);
+    --btn1Border: rgba(255,255,255,0.3);
+    --btn1HoverColor: rgba(51,68,79);
+    --btn1HoverBG: rgba(255,255,255,0.8);
+    --btn1HoverShadow: rgba(255,255,255,0.3);
+    --btn1ActiveBG: rgba(158,227,255,0.8);
+    --btn1ActiveShadow: rgba(158,227,255,0.3);
+    /* button 2 */
+    --btn2Color: rgba(38,39,44);
+    --btn2BG: rgba(240,245,247,0.5);
+    --btn2Shadow: rgba(0,0,0,0.3);
+    --btn2HoverColor: rgba(80,107,125);
+    --btn2HoverBG: rgba(240,245,247,0.8);
+    --btn2HoverShadow: rgba(240,245,247,0.3);
+    --btn2ActiveColor: rgba(255,255,255);
+    --btn2ActiveBG: rgba(158,227,255,0.8);
+    --btn2ActiveShadow: rgba(158,227,255,0.3);
+}
+
+/* ───────────────────────────────────────────────── */
+/* 로고 관련 */
+
+.lg-title {
+    display: inline-block;
+}
+.sm-title {
+    display: none;
+}
+@media screen and (max-width: 650px) {
+    .lg-title {
+        display: none;
+    }
+    .sm-title {
+        display: inline-block;
+    }
+}
+
+/* 일반적인 스타일 */
+
+:root {
+    --slider-handle-size: 15px;
+    --panelMargin: 25px; /* floating panel 양 옆 여백 */
+    --dividerSize: 12px; /* 두 창 사이 divider 크기 */
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+html, body {
+    position: absolute;
+    margin: 0px;
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    color: var(--textColor);
+    cursor: default;
+    user-select: none;
+}
+html {
+    background: var(--bg);
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    overflow-y: auto;
+    /* overflow: hidden; */
+}
+body {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: safe center; /* horizontal */
+    justify-content: start;
+    /* justify-content: center; vertical */
+    /* overflow-y: auto; */
+}
+
+h1, h2, h3, h4 {
+    text-align: center;
+}
+
+/* ───────────────────────────────────────────────── */
+/* Buttons */
+
+/*? button 1 */
+
+.button1 {
+    font-family: inherit;
+    background: none;
+    outline: none;
+    border: 3px solid var(--btn1Border);
+    color: var(--btn1Color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    white-space: nowrap;
+    font-weight: bold;
+    transition: background-color 0.5s, box-shadow 0.5s, color 0.5s, border 0.5s;
+    display: inline-block;
+    vertical-align: middle;
+    align-items: center;
+}
+@media (hover: hover) and (pointer: fine) {
+    .button1:enabled:hover {
+        color: var(--btn1HoverColor);
+        border: 3px solid transparent;
+        background-color: var(--btn1HoverBG);
+        box-shadow: 0 0 5px 2px var(--btn1HoverShadow);
+        /* text-overflow: unset; */
+    }
+}
+.button1:enabled:active {
+    background-color: var(--btn1ActiveBG);
+    box-shadow: 0 0 5px 2px var(--btn1ActiveShadow);
+    /* overflow: visible; */
+}
+.button1:disabled {
+    border: 3px dashed rgba(163, 163, 163, 0.3);
+}
+
+.button1 img {
+    display: inline-block;
+    vertical-align: middle;
+    object-fit: contain;
+    width: 35px;
+    height: 18px;
+}
+.button1 span {
+    margin-left: 8px;
+}
+
+/*? button 2 */
+
+.button2, .toggleButton {
+    width: fit-content;
+    height: fit-content;
+    font-family: inherit;
+    background-color: var(--btn2BG);
+    border: none;
+    color: var(--btn2Color);
+    font-size: 16px;
+    box-shadow: 0 2px 5px 2px var(--btn2Shadow);
+    outline: none;
+    overflow: hidden;
+    border-radius: 20px;
+    text-align: center;
+    padding: 5px 15px;
+    transition: box-shadow 0.5s, background-color 0.5s, color 0.5s;
+    display: inline-block;
+    vertical-align: middle;
+}
+@media (hover: hover) and (pointer: fine) {
+    .button2:hover {
+        background-color: var(--btn2HoverBG);
+        box-shadow: 0 0 5px 2px var(--btn2HoverShadow);
+        color: var(--btn2HoverColor);
+    }
+}
+.button2:active, .toggleButtonState:checked+.toggleButton{
+    background-color: var(--btn2ActiveBG);
+    box-shadow: 0 0 5px 2px var(--btn2ActiveShadow), 0 2px 5px 2px var(--btn2Shadow);
+    color: var(--btn2ActiveColor);
+}
+
+/* ───────────────────────────────────────────────── */
+/* Miscellaneous */
+
+.separator {
+    width: 100px;
+    height: 2px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: var(--separatorColor);
+}
