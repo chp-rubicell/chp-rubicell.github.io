@@ -24,8 +24,7 @@ function updateText(e, inputBefore) {
 
   if (str === str.normalize("NFC")) {
     dispStr = str;
-  } else if (str === str.normalize("NFD")) {
-
+  } else {
     for (const char of str) {
       /*
             // 3. Get the Unicode code point for each character
