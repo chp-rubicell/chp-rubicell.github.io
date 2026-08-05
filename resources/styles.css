@@ -169,16 +169,41 @@ a:not(.button1, .button2):active {
     -moz-box-sizing: border-box;
 }
 
-.PageGroup > button {
-    font-size: 16px;
+.PageGroup>button,
+.PageGroup>.HorizontalArray {
     width: 100%;
     height: 45px;
-    /* height: 40px; */
     margin: 10px 0;
-    /* border-radius: 8px; */
+}
+.PageGroup>button,
+.PageGroup>.HorizontalArray>button {
+    font-size: 16px;
     border-radius: 10px;
     padding: 1px max(10px, 8%);
 }
+
+.HorizontalArray{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+.PageGroup>.HorizontalArray>button {
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+.HorizontalArray .epeditlogo {
+    height: 20px
+}
+.epeditlogo {
+    transition: color 0.5s;
+    color: #A5A9B1;
+}
+.epeditlogo>svg {
+    height: 100%;
+    width: auto;
+}
+
 .PageGroup h1 {
     font-size: 25px;
 }
@@ -224,9 +249,11 @@ a:not(.button1, .button2):active {
     display: inline-block;
     vertical-align: middle;
     object-fit: contain;
+    flex-shrink: 0;
+}
+.button1 img.eplogo {
     width: 35px;
     height: 18px;
-    flex-shrink: 0;
 }
 .button1 span {
     margin-left: 8px;
@@ -243,6 +270,9 @@ a:not(.button1, .button2):active {
         background-color: var(--btnHoverBG);
         box-shadow: 0 0 5px 2px var(--btnHoverShadow);
         /* text-overflow: unset; */
+    }
+    .button1:enabled:hover .epeditlogo {
+        color: #4F535B;
     }
     .button1:enabled:hover span.highlighted {
         color: var(--btnHoverColor);
@@ -312,4 +342,3 @@ a:not(.button1, .button2):active {
 }
 .FloatWrapper button:active {
 } */
-
