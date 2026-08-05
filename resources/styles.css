@@ -118,6 +118,7 @@ body {
     align-items: safe center; /* vertical */
     justify-content: center; /* horizontal */
     overflow-y: auto;
+    zoom: 1.2;
 }
 hr {
     border: solid;
