@@ -1,3 +1,6 @@
+:root {
+    --zoom-level: 1.1;
+}
 :root[colorTheme='light'] {
     --bgImage: #fff;
     --textColor: #33444f;
@@ -118,7 +121,7 @@ body {
     align-items: safe center; /* vertical */
     justify-content: center; /* horizontal */
     overflow-y: auto;
-    zoom: 1.2;
+    zoom: var(--zoom-level);
 }
 hr {
     border: solid;
