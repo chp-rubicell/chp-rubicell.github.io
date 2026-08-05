@@ -195,13 +195,12 @@ a:not(.button1, .button2):active {
 .HorizontalArray .epeditlogo {
     height: 20px
 }
-.epeditlogo {
-    transition: color 0.5s;
-    color: #A5A9B1;
-}
 .epeditlogo>svg {
     height: 100%;
     width: auto;
+}
+.epeditlogo>svg * {
+    transition: fill 0.5s;
 }
 
 .PageGroup h1 {
@@ -271,8 +270,8 @@ a:not(.button1, .button2):active {
         box-shadow: 0 0 5px 2px var(--btnHoverShadow);
         /* text-overflow: unset; */
     }
-    .button1:enabled:hover .epeditlogo {
-        color: #4F535B;
+    .button1:enabled:hover .epeditlogo>svg * {
+        fill: var(--btnHoverColor);
     }
     .button1:enabled:hover span.highlighted {
         color: var(--btnHoverColor);
