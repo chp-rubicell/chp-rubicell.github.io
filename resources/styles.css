@@ -277,17 +277,21 @@ a:not(.button1, .button2):active {
         box-shadow: 0 0 5px 2px var(--btnHoverShadow);
         /* text-overflow: unset; */
     }
-    .button1:hover .epeditlogo>svg * {
-        fill: var(--btnHoverColor);
-    }
     .button1:hover span.highlighted {
         color: var(--btnHoverColor);
+    }
+    .button1:hover .epeditlogo>svg * {
+        fill: var(--btnHoverColor);
     }
 }
 .button1:active {
     background-color: var(--btnActiveBG);
     box-shadow: 0 0 5px 2px var(--btnActiveShadow);
     /* overflow: visible; */
+    color: var(--btnHoverColor);
+}
+.button1:active .epeditlogo>svg * {
+    fill: var(--btnHoverColor);
 }
 .button1:disabled {
     border: 3px dashed rgba(163, 163, 163, 0.3);
