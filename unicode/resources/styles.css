@@ -32,7 +32,7 @@ h2 {
     flex-direction: column;
 }
 
-label {
+label, .label {
     color: var(--keyColor);
     font-size: 20px;
     font-weight: bold;
@@ -120,7 +120,7 @@ button:hover {
     opacity: 0;
 }
 .copied .check-icon {
-    opacity: 100;
+    opacity: 1;
 }
 .copied .copy-icon {
     opacity: 0;

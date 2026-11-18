@@ -9,7 +9,7 @@ function copyToClipboard(elmt) {
       elmt.classList.add("copied");
       setTimeout(() => {
         elmt.classList.remove("copied");
-      }, 500);
+      }, 1000);
     })
     .catch((err) => {
       console.error("Failed to copy:", err);
